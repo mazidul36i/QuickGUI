@@ -1,0 +1,8 @@
+name: QuickGUI
+version: '${version}'
+main: com.gliesestudio.mc.quickgui.QuickGUI
+api-version: '1.21'
+prefix: QuickGUI
+authors: [ Mazidul Islam ]
+description: QuickGUI is the goto plugin to manage all your GUI needs.
+website: https://mazidul.com
