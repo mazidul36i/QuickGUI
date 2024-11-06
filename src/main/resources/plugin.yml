@@ -1,0 +1,7 @@
+name: BetterGUI
+version: '1.0-alpha'
+main: com.gliesestudio.mc.bettergui.BetterGUI
+api-version: '1.21'
+authors: [ Mazidul Islam ]
+description: Better TPA is the goto plugin to manage player tpa and set warps with ease.
+website: https://mazidul.com
