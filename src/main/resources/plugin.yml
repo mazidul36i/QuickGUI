@@ -6,3 +6,28 @@ prefix: QuickGUI
 authors: [ Mazidul Islam ]
 description: QuickGUI is the goto plugin to manage all your GUI needs.
 website: https://mazidul.com
+
+permissions:
+  quickgui.action:
+    description: Permission to execute specific actions for QuickGUI
+    default: op
+
+  quickgui.gui:
+    description: Open a custom GUI
+    default: true
+
+
+commands:
+  quickgui:
+    description: Execute specific actions for QuickGUI
+    usage: /quickgui <action>
+    permission: quickgui.action
+    permission-message: "You don't have permission to use this command."
+    aliases:
+      - qgui
+
+  gui:
+    description: Opens a custom GUI for the player
+    usage: /gui <guiName>
+    permission: quickgui.gui
+    permission-message: "You don't have permission to open this GUI."
