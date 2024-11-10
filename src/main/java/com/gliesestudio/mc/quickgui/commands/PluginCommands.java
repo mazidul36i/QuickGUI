@@ -7,7 +7,8 @@ public interface PluginCommands {
     String EDIT_GUI = "editgui";
 
     enum Action {
-        RELOAD("reload");
+        RELOAD("reload"),
+        CREATE("create");
 
         private final String action;
 

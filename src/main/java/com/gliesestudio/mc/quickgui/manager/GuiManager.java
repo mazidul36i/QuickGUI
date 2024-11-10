@@ -2,6 +2,7 @@ package com.gliesestudio.mc.quickgui.manager;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
+import com.gliesestudio.mc.quickgui.model.GuiItem;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -15,7 +16,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,59 +61,83 @@ public class GuiManager {
         }
 
         // Loop through each file in the guis folder
-        for (File file : guiFiles) {
-            if (file.isFile() && file.getName().endsWith(".yml")) {
-                FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-                String guiName = file.getName().replace(".yml", ""); // Use file name as GUI name
-                Component titleText = Component.text(PluginUtils.translateColorCodes(config.getString("title", "Custom GUI")));
-                int rows = config.getInt("rows", 3);
-
-                // Create an inventory for the GUI
-                QuickGuiHolder holder = new QuickGuiHolder(plugin);
-                Inventory inventory = Bukkit.createInventory(holder, rows * 9, titleText);
-                Map<Integer, String> commandMap = new HashMap<>();
-
-                for (String slotKey : config.getConfigurationSection("items").getKeys(false)) {
-                    int slot = Integer.parseInt(slotKey.replace("slot", ""));
-                    String materialName = config.getString("items." + slotKey + ".item", "STONE");
-                    String displayName = config.getString("items." + slotKey + ".display-name", "");
-                    String command = config.getString("items." + slotKey + ".command");
-
-                    Material material = Material.getMaterial(materialName.toUpperCase());
-                    if (material == null) {
-                        plugin.getLogger().warning("Invalid material in file " + file.getName() + " for slot " + slot + ". Defaulting to STONE.");
-                        material = Material.STONE;
-                    }
-
-                    ItemStack item = new ItemStack(material);
-                    ItemMeta meta = item.getItemMeta();
-                    if (meta != null) {
-                        meta.displayName(Component.text(PluginUtils.translateColorCodes(displayName)));
-                        item.setItemMeta(meta);
-                    }
-
-                    inventory.setItem(slot, item);
-
-                    if (command != null) {
-                        commandMap.put(slot, command);
-                    }
-                }
-
-                guis.put(guiName, inventory);
-                guiCommands.put(guiName, commandMap);
-            }
+        for (File guiFile : guiFiles) {
+            String guiName = guiFile.getName().replace(".yml", "");
+            Inventory gui = createGui(guiFile, guiName);
+            guis.put(guiName, gui);
         }
+
         log.info("Loaded guis: {}", guis.size());
         return guis.size();
     }
 
-    public int reloadGuis() {
-        return loadGuis();
+    @Nullable
+    private Inventory createGui(File guiFile, String guiName) {
+        log.info("Loading gui config from file: {}", guiFile.getName());
+        if (!(guiFile.isFile() && guiFile.getName().endsWith(".yml"))) {
+            log.warn("Invalid file format. Skipping");
+            return null;
+        }
+
+        // Get the name of the GUI from the file name
+        FileConfiguration guiConfig = YamlConfiguration.loadConfiguration(guiFile);
+
+        // Get the title and rows from the configuration
+        Component titleText = Component.text(PluginUtils.translateColorCodes(guiConfig.getString("title", "Custom GUI")));
+        int rows = guiConfig.getInt("rows", 3);
+
+        // Create an inventory for the GUI
+        QuickGuiHolder holder = new QuickGuiHolder(plugin);
+        Inventory gui = Bukkit.createInventory(holder, rows * 9, titleText);
+        Map<Integer, String> commandMap = new HashMap<>();
+
+        List<GuiItem> guiItems = loadItemsFromConfig(guiConfig);
+        log.info("Items list count for gui: {}", guiItems.size());
+        for (GuiItem guiItem : guiItems) {
+            int slot = (guiItem.getRow() - 1) * 9 + (guiItem.getColumn() - 1);
+
+            ItemStack itemStack = new ItemStack(guiItem.getItem());
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta != null) {
+                meta.displayName(Component.text(PluginUtils.translateColorCodes(guiItem.getDisplayName())));
+                itemStack.setItemMeta(meta);
+            }
+            gui.setItem(slot, itemStack);
+
+            // Register the command for this item slot
+            if (guiItem.getCommand() != null) {
+                commandMap.put(slot, guiItem.getCommand());
+            }
+        }
+
+        guiCommands.put(guiName, commandMap);
+        return gui;
     }
 
-    public Map<String, Inventory> getGuis() {
-        return guis;
+    private List<GuiItem> loadItemsFromConfig(FileConfiguration config) {
+        List<GuiItem> items = new ArrayList<>();
+
+        List<Map<?, ?>> itemList = config.getMapList("items");
+        for (Map<?, ?> itemConfig : itemList) {
+            String materialName = (String) itemConfig.get("item");
+            Material material = Material.matchMaterial(materialName);
+            if (material == null) continue;
+
+            String displayName = (String) itemConfig.get("display-name");
+            String command = (String) itemConfig.get("command");
+
+            Map<?, ?> position = (Map<?, ?>) itemConfig.get("position");
+            int row = (int) position.get("row");
+            int column = (int) position.get("column");
+
+            GuiItem guiItem = new GuiItem(material, displayName, command, row, column);
+            items.add(guiItem);
+        }
+        return items;
+    }
+
+    public int reloadGuis() {
+        return loadGuis();
     }
 
     public Inventory getGui(String name) {

@@ -8,8 +8,8 @@ description: QuickGUI is the goto plugin to manage all your GUI needs.
 website: https://mazidul.com
 
 permissions:
-  quickgui.action:
-    description: Permission to execute specific actions for QuickGUI
+  quickgui.admin:
+    description: Permission to execute action commands like create, edit, delete, reload, etc for QuickGUI.
     default: op
 
   quickgui.gui:
@@ -19,9 +19,9 @@ permissions:
 
 commands:
   editgui:
-    description: Execute specific actions for QuickGUI like edit, add, remove, reload, etc.
+    description: Execute specific actions for QuickGUI like create, edit, delete, reload, etc.
     usage: /editgui <action>
-    permission: quickgui.edit
+    permission: quickgui.admin
     permission-message: "You don't have permission to use this command."
     aliases:
       - egui

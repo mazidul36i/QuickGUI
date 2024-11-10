@@ -1,0 +1,17 @@
+title: "&l&4Welcome to QuickGUI"
+rows: 3
+
+# List of items in the GUI.
+items:
+  - item: "DIAMOND"
+    display-name: "&bWelcome"
+    command: "say Hello, %player%! Welcome to the QuickGUI"
+    position:
+      row: 2
+      column: 3
+  - item: "ENCHANTED_BOOK"
+    display-name: "&cHelp"
+    command: "help quickgui"
+    position:
+      row: 2
+      column: 2
