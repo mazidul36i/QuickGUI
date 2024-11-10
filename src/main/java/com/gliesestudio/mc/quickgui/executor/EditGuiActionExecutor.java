@@ -37,8 +37,7 @@ public class EditGuiActionExecutor implements CommandExecutor {
 
         // Execute the reload action
         if (PluginCommands.Action.RELOAD.equals(action)) {
-            reloadPluginConfig();
-            sender.sendMessage(PluginUtils.translateColorCodes("&aAll GUIs have been reloaded!"));
+            reloadPluginConfig(sender);
             return true;
         }
 
@@ -47,9 +46,14 @@ public class EditGuiActionExecutor implements CommandExecutor {
         return false;
     }
 
-    public void reloadPluginConfig() {
+    public void reloadPluginConfig(@NotNull CommandSender sender) {
         plugin.reloadConfig();
-        guiManager.reloadGuis();
+        sender.sendMessage("§aReloaded plugin configs.");
+        int guiSize = guiManager.reloadGuis();
+        if (guiSize == 0)
+            sender.sendMessage("§6No GUI configured to load! Create your first GUI using /editgui add <name>.");
+        else
+            sender.sendMessage("§aLoaded " + guiSize + " GUI" + (guiSize == 1 ? "" : "s") + ".");
     }
 
 }

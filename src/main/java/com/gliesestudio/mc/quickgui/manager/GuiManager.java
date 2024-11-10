@@ -46,7 +46,7 @@ public class GuiManager {
     /**
      * Loads all GUI definitions from the configuration file.
      */
-    private void loadGuis() {
+    private int loadGuis() {
         log.info("Loading GUIs...");
         guis.clear();
         guiCommands.clear();
@@ -54,7 +54,7 @@ public class GuiManager {
         File[] guiFiles = guiFolder.listFiles();
         if (guiFiles == null || guiFiles.length == 0) {
             log.info("No GUI files found!");
-            return;
+            return 0;
         }
 
         // Loop through each file in the guis folder
@@ -102,10 +102,11 @@ public class GuiManager {
             }
         }
         log.info("Loaded guis: {}", guis.size());
+        return guis.size();
     }
 
-    public void reloadGuis() {
-        loadGuis();
+    public int reloadGuis() {
+        return loadGuis();
     }
 
     public Map<String, Inventory> getGuis() {

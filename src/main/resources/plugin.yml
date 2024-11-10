@@ -18,13 +18,13 @@ permissions:
 
 
 commands:
-  quickgui:
-    description: Execute specific actions for QuickGUI
-    usage: /quickgui <action>
-    permission: quickgui.action
+  editgui:
+    description: Execute specific actions for QuickGUI like edit, add, remove, reload, etc.
+    usage: /editgui <action>
+    permission: quickgui.edit
     permission-message: "You don't have permission to use this command."
     aliases:
-      - qgui
+      - egui
 
   gui:
     description: Opens a custom GUI for the player
