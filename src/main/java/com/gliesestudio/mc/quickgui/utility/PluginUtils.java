@@ -1,5 +1,6 @@
 package com.gliesestudio.mc.quickgui.utility;
 
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -19,6 +20,10 @@ public interface PluginUtils {
             }
         }
         return new String(b);
+    }
+
+    static String replacePlaceholders(String placeholderText, Player player) {
+        return placeholderText.replace("%player%", player.getName());
     }
 
     static boolean isEmptyCollection(Collection<?> collection) {

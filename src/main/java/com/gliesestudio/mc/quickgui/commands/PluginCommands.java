@@ -1,5 +1,7 @@
 package com.gliesestudio.mc.quickgui.commands;
 
+import javax.annotation.Nullable;
+
 public interface PluginCommands {
 
     String OPEN_GUI = "gui";
@@ -8,7 +10,8 @@ public interface PluginCommands {
 
     enum Action {
         RELOAD("reload"),
-        CREATE("create");
+        CREATE("create"),
+        EDIT("edit");
 
         private final String action;
 
@@ -35,6 +38,38 @@ public interface PluginCommands {
             return null;
         }
 
+    }
+
+    enum SystemCommand {
+        CANCEL("cancel"),
+        CLOSE("close"),
+        DONE("done");
+
+        private final String command;
+
+        SystemCommand(String command) {
+            this.command = command;
+        }
+
+        /**
+         * This method is used to get the system command from the string.
+         *
+         * @param command The command to get.
+         * @return The system command.
+         */
+        @Nullable
+        public static SystemCommand fromString(String command) {
+            for (SystemCommand c : SystemCommand.values()) {
+                if (c.command.equalsIgnoreCase(command)) {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        public String getCommand() {
+            return command;
+        }
     }
 
 }

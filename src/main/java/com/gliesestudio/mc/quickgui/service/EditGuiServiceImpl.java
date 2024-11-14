@@ -1,11 +1,15 @@
 package com.gliesestudio.mc.quickgui.service;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
+import com.gliesestudio.mc.quickgui.commands.PluginCommands;
 import com.gliesestudio.mc.quickgui.manager.GuiManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EditGuiServiceImpl implements EditGuiService {
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(GuiManager.class);
 
     private final Logger logger;
     private final QuickGUI plugin;
@@ -64,4 +70,20 @@ public class EditGuiServiceImpl implements EditGuiService {
         return false;
     }
 
+    @Override
+    public boolean editGui(@NotNull Player player, String name) {
+        // Create the GUI file and prepare GUI.
+        File guiFile = new File(plugin.getDataFolder(), "guis/" + name + ".yml");
+        Inventory gui = guiManager.createGuiFromYml(guiFile, name, PluginCommands.Action.EDIT);
+
+        // Verify if any GUI exists with the name.
+        if (gui == null) {
+            player.sendMessage("§cNo GUI with the name '§r" + name + "§c' exists.");
+            return true;
+        }
+
+        // Open the GUI
+        player.openInventory(gui);
+        return true;
+    }
 }

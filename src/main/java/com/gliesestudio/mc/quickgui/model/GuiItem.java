@@ -1,5 +1,7 @@
 package com.gliesestudio.mc.quickgui.model;
 
+import com.gliesestudio.mc.quickgui.enums.CommandExecutor;
+import com.gliesestudio.mc.quickgui.enums.ItemStackType;
 import org.bukkit.Material;
 
 public class GuiItem {
@@ -9,13 +11,16 @@ public class GuiItem {
     private String command;
     private int row;
     private int column;
+    private ItemStackType itemStackType;
+    private CommandExecutor executor;
 
-    public GuiItem(Material item, String displayName, String command, int row, int column) {
+    public GuiItem(Material item, String displayName, String command, int row, int column, ItemStackType itemStackType) {
         this.item = item;
         this.displayName = displayName;
         this.command = command;
         this.row = row;
         this.column = column;
+        this.itemStackType = itemStackType;
     }
 
     public Material getItem() {
@@ -58,6 +63,22 @@ public class GuiItem {
         this.column = column;
     }
 
+    public ItemStackType getItemStackType() {
+        return itemStackType;
+    }
+
+    public void setItemStackType(ItemStackType itemStackType) {
+        this.itemStackType = itemStackType;
+    }
+
+    public CommandExecutor getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(CommandExecutor executor) {
+        this.executor = executor;
+    }
+
     @Override
     public String toString() {
         return "GuiItem{" +
@@ -66,6 +87,7 @@ public class GuiItem {
                 ", command='" + command + '\'' +
                 ", row=" + row +
                 ", column=" + column +
+                ", itemStackType=" + itemStackType +
                 '}';
     }
 }

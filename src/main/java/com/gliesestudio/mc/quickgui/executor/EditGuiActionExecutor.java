@@ -8,6 +8,7 @@ import com.gliesestudio.mc.quickgui.service.EditGuiServiceImpl;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class EditGuiActionExecutor implements CommandExecutor {
@@ -38,15 +39,24 @@ public class EditGuiActionExecutor implements CommandExecutor {
             return false;
         }
 
-        // Execute the reload action
+        // Execute the 'reload' action
         if (PluginCommands.Action.RELOAD.equals(action)) {
             reloadPluginConfig(sender);
             return true;
         }
 
-        // Execute the add action
+        // Execute the 'create' action
         if (PluginCommands.Action.CREATE.equals(action)) {
             return createGui(sender, args);
+        }
+
+        // Execute the 'edit' action
+        if (PluginCommands.Action.EDIT.equals(action)) {
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage("§cOnly players can use this command.");
+                return true;
+            }
+            return editGui(player, args);
         }
 
         // Make more actions as needed...
@@ -64,7 +74,7 @@ public class EditGuiActionExecutor implements CommandExecutor {
             sender.sendMessage("§aLoaded " + guiSize + " GUI" + (guiSize == 1 ? "" : "s") + ".");
     }
 
-    private boolean createGui(@NotNull CommandSender sender, String[] args) {
+    private boolean createGui(@NotNull CommandSender sender, String @NotNull [] args) {
         if (args.length <= 1) {
             sender.sendMessage("§cPlease specify the name of the GUI to create.");
             return false;
@@ -88,6 +98,16 @@ public class EditGuiActionExecutor implements CommandExecutor {
 
         // Create gui with the name of rows.
         return editGuiService.createGui(sender, name, rows);
+    }
+
+    private boolean editGui(@NotNull Player player, String @NotNull [] args) {
+        if (args.length <= 1) {
+            player.sendMessage("§cPlease specify the name of the GUI to edit.");
+            return false;
+        }
+        String name = args[1];
+
+        return editGuiService.editGui(player, name);
     }
 
 }

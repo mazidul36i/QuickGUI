@@ -54,17 +54,22 @@ public class EditActionTabCompleter implements TabCompleter {
     private static final Logger log = LoggerFactory.getLogger(EditActionTabCompleter.class);
     private static final Set<PluginCommands.Action> actions = Set.of(PluginCommands.Action.values());
 
-    public EditActionTabCompleter() {
+    private final GuiManager guiManager;
+
+    public EditActionTabCompleter(GuiManager guiManager) {
+        this.guiManager = guiManager;
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        // Suggestion list.
+        List<String> suggestions = new ArrayList<>();
+
         if (!StringUtils.equals(command.getName(), PluginCommands.EDIT_GUI)) {
             log.debug("Registered wrong command for EditActionTabCompleter: {}", command);
-            return new ArrayList<>();
+            return suggestions;
         }
 
-        List<String> suggestions = new ArrayList<>();
         if (args.length == 1) {
             for (PluginCommands.Action action : actions) {
                 if (action.getAction().toLowerCase().contains(args[0].toLowerCase())) {
@@ -72,6 +77,14 @@ public class EditActionTabCompleter implements TabCompleter {
                 }
             }
         }
+
+        if (args.length == 2) {
+            PluginCommands.Action action = PluginCommands.Action.fromString(args[0]);
+            if (PluginCommands.Action.EDIT.equals(action)) {
+                suggestions.addAll(guiManager.getGuiNames());
+            }
+        }
+
         return suggestions;
     }
 

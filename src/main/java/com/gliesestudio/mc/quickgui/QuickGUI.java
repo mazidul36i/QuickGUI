@@ -51,11 +51,11 @@ public final class QuickGUI extends JavaPlugin {
             openGuiCommand.setTabCompleter(new OpenGuiTabCompleter(guiManager));
         }
 
-        // Register the OpenGuiCommand
+        // Register the EditGuiCommand
         PluginCommand editGuiCommand = getCommand(PluginCommands.EDIT_GUI);
         if (Objects.nonNull(editGuiCommand)) {
             editGuiCommand.setExecutor(new EditGuiActionExecutor(this, guiManager));
-            editGuiCommand.setTabCompleter(new EditActionTabCompleter());
+            editGuiCommand.setTabCompleter(new EditActionTabCompleter(guiManager));
         }
 
     }
