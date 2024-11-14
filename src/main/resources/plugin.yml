@@ -1,0 +1,33 @@
+name: QuickGUI
+version: '${version}'
+main: com.gliesestudio.mc.quickgui.QuickGUI
+api-version: '1.21'
+prefix: QuickGUI
+authors: [ Mazidul Islam ]
+description: QuickGUI is the goto plugin to manage all your GUI needs.
+website: https://mazidul.com
+
+permissions:
+  quickgui.admin:
+    description: Permission to execute action commands like create, edit, delete, reload, etc for QuickGUI.
+    default: op
+
+  quickgui.gui:
+    description: Open a custom GUI
+    default: true
+
+
+commands:
+  editgui:
+    description: Execute specific actions for QuickGUI like create, edit, delete, reload, etc.
+    usage: /editgui <action>
+    permission: quickgui.admin
+    permission-message: "You don't have permission to use this command."
+    aliases:
+      - egui
+
+  gui:
+    description: Opens a custom GUI for the player
+    usage: /gui <guiName>
+    permission: quickgui.gui
+    permission-message: "You don't have permission to open this GUI."
