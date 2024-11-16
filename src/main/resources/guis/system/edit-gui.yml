@@ -200,7 +200,7 @@ items:
       -
       - "&bRight Click:"
       - "&3Edit Selected Items"
-    command: null
+    command: "edit items"
     position:
       row: 3
       column: 9

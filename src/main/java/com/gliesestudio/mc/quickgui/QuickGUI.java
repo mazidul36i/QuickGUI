@@ -73,7 +73,7 @@ public final class QuickGUI extends JavaPlugin {
         PluginManager pluginManager = getServer().getPluginManager();
 
         // Register gui click listener
-        pluginManager.registerEvents(new GuiListener(guiManager, this), this);
+        pluginManager.registerEvents(new GuiListener(guiManager), this);
         pluginManager.registerEvents(new SystemGuiListener(this, systemGuiManager, chatListener), this);
 
         // Register the chat listener

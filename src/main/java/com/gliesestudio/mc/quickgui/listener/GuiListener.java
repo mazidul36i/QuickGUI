@@ -1,7 +1,7 @@
 package com.gliesestudio.mc.quickgui.listener;
 
-import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
+import com.gliesestudio.mc.quickgui.enums.ActionCommand;
 import com.gliesestudio.mc.quickgui.enums.CommandExecutor;
 import com.gliesestudio.mc.quickgui.enums.ItemStackType;
 import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
@@ -17,11 +17,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ListIterator;
 
 
 public class GuiListener implements Listener {
@@ -29,7 +26,7 @@ public class GuiListener implements Listener {
     private static final Logger log = LoggerFactory.getLogger(GuiListener.class);
     private final GuiManager guiManager;
 
-    public GuiListener(GuiManager guiManager, QuickGUI plugin) {
+    public GuiListener(GuiManager guiManager) {
         this.guiManager = guiManager;
     }
 
@@ -71,7 +68,7 @@ public class GuiListener implements Listener {
         }
 
         if (PluginCommands.Action.EDIT.equals(holder.getAction()))
-            handleAdminGuiClick(event, player, clickedInventory, command, itemStackType);
+            handleAdminGuiClick(command, itemStackType);
         else {
             event.setCancelled(true); // Prevent players from taking items
             handleUserGuiClick(player, commandExecutor, command);
@@ -91,10 +88,10 @@ public class GuiListener implements Listener {
         }
     }
 
-    private void handleAdminGuiClick(InventoryClickEvent event, Player player, Inventory clickedInventory, String command, ItemStackType itemStackType) {
+    private void handleAdminGuiClick(String command, ItemStackType itemStackType) {
         log.info("Item stack type: {}, command: {}", itemStackType, command);
         if (ItemStackType.SYSTEM_BUTTON.equals(itemStackType)) {
-            PluginCommands.SystemCommand systemCommand = PluginCommands.SystemCommand.fromString(command);
+            ActionCommand systemCommand = ActionCommand.fromString(command);
             log.info("system command: {}", systemCommand);
         }
     }
