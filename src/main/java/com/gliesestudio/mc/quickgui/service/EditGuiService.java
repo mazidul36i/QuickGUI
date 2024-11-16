@@ -6,9 +6,11 @@ import org.jetbrains.annotations.NotNull;
 
 public interface EditGuiService {
 
-    boolean createGui(@NotNull CommandSender sender, String name, int rows);
+    void createGui(@NotNull CommandSender sender, String name, int rows);
 
     void reloadGui(String name);
+
+    void reloadGuis();
 
     boolean editGui(@NotNull Player player, String name);
 
@@ -17,5 +19,9 @@ public interface EditGuiService {
     boolean editGuiTitle(String name, String newTitle);
 
     boolean editGuiRows(String name, int newRows);
+
+    boolean editGuiPermission(String name, String newPermission);
+
+    boolean editGuiAlias(String name, String newAlias);
 
 }

@@ -76,8 +76,8 @@ public class SystemGuiManager {
                 SystemPlaceholder.GUI_NAME, editGuiHolder.getName(),
                 SystemPlaceholder.GUI_TITLE, editGuiHolder.getTitle().content(),
                 SystemPlaceholder.GUI_ROWS, String.valueOf(editGuiHolder.getInventory().getSize() / 9),
-                SystemPlaceholder.GUI_OPEN_PERMISSION, "NONE", // TODO: not implemented yet
-                SystemPlaceholder.GUI_ALIAS, "NONE" // TODO: not implemented yet
+                SystemPlaceholder.GUI_OPEN_PERMISSION, editGuiHolder.getPermission() != null ? editGuiHolder.getPermission() : "NONE",
+                SystemPlaceholder.GUI_ALIAS, editGuiHolder.getAlias() != null ? editGuiHolder.getAlias() : "NONE"
         );
 
         // Get the title and rows from the configuration

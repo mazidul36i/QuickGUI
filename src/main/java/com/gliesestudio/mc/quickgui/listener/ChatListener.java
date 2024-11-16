@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class ChatListener implements Listener {
 
@@ -46,14 +47,21 @@ public class ChatListener implements Listener {
 
             switch (awaitingInputHolder.getInputType()) {
                 case INPUT_NAME -> {
+                    Pattern pattern = Pattern.compile("^[a-zA-Z0-9_-]+$");
+                    if (!(pattern.matcher(textInput).matches())) {
+                        player.sendMessage("§eInvalid GUI name. The name must contain only alphabets, numbers, underscores, and hyphens.");
+                        return;
+                    }
+
                     boolean isSaved = editGuiService.editGuiName(name, textInput);
-                    if (isSaved) openEditGuiBack(player, name);
-                    else player.sendMessage("§cFailed to change GUI name");
+                    if (isSaved) {
+                        openEditGuiBackReloadAll(player, textInput);
+                    } else player.sendMessage("§cFailed to change GUI name");
                 }
 
                 case INPUT_TITLE -> {
                     boolean isSaved = editGuiService.editGuiTitle(name, textInput);
-                    if (isSaved) openEditGuiBack(player, name);
+                    if (isSaved) openEditGuiBack(player, name, true);
                     else player.sendMessage("§cFailed to change GUI title");
                 }
 
@@ -61,13 +69,29 @@ public class ChatListener implements Listener {
                     try {
                         int newRows = Integer.parseInt(textInput);
                         boolean isSaved = editGuiService.editGuiRows(name, newRows);
-                        if (isSaved) openEditGuiBack(player, name);
+                        if (isSaved) openEditGuiBack(player, name, true);
                         else player.sendMessage("§cFailed to change GUI title");
                     } catch (NumberFormatException e) {
                         player.sendMessage("§cPlease enter a valid row count from 1 to 6");
                         return;
                     }
                 }
+
+                case INPUT_PERMISSION -> {
+                    boolean isSaved = editGuiService.editGuiPermission(name, textInput);
+                    if (isSaved) openEditGuiBack(player, name, true);
+                    else player.sendMessage("§cFailed to change GUI permission");
+                }
+
+                case INPUT_ALIAS -> {
+                    boolean isSaved = editGuiService.editGuiAlias(name, textInput);
+//                    editGuiService.reloadGuis();
+                    if (isSaved) openEditGuiBackReloadAll(player, name);
+                    else player.sendMessage("§cFailed to change GUI alias");
+                }
+
+                // If no input has matched or not implemented
+                case null, default -> player.sendMessage("§eUnknown input");
             }
 
             // Remove player from the waiting map
@@ -75,10 +99,18 @@ public class ChatListener implements Listener {
         }
     }
 
-    private void openEditGuiBack(Player player, String name) {
+    private void openEditGuiBack(Player player, String name, boolean reload) {
         // Schedule the inventory opening on the main thread
         Bukkit.getScheduler().runTask(plugin, () -> {
-            editGuiService.reloadGui(name);
+            if (reload) editGuiService.reloadGui(name);
+            editGuiService.editGui(player, name);
+        });
+    }
+
+    private void openEditGuiBackReloadAll(Player player, String name) {
+        // Schedule the inventory opening on the main thread
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            editGuiService.reloadGuis();
             editGuiService.editGui(player, name);
         });
     }

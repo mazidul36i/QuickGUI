@@ -4,6 +4,8 @@ public enum AwaitingInputType {
 
     INPUT_NAME,
     INPUT_TITLE,
-    INPUT_ROW
+    INPUT_ROW,
+    INPUT_PERMISSION,
+    INPUT_ALIAS,
 
 }

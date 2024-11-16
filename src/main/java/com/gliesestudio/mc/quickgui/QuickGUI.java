@@ -29,6 +29,9 @@ public final class QuickGUI extends JavaPlugin {
     // Listeners
     private ChatListener chatListener;
 
+    // Commands
+    private OpenGuiCommand openGuiCommandExecutor;
+
     // Services
     private EditGuiService editGuiService;
 
@@ -37,11 +40,17 @@ public final class QuickGUI extends JavaPlugin {
         displayStartingMessage();
         saveDefaultConfig();
 
+        // Initialize gui managers
         guiManager = new GuiManager(this);
         systemGuiManager = new SystemGuiManager(this);
 
+        // Initialize services
         editGuiService = new EditGuiServiceImpl(this, guiManager, systemGuiManager);
 
+        // Initialize commands
+        openGuiCommandExecutor = new OpenGuiCommand(guiManager);
+
+        // Initialize listeners
         chatListener = new ChatListener(this, editGuiService);
 
         registerEvents();
@@ -77,7 +86,7 @@ public final class QuickGUI extends JavaPlugin {
         // Register the OpenGuiCommand
         PluginCommand openGuiCommand = getCommand(PluginCommands.OPEN_GUI);
         if (Objects.nonNull(openGuiCommand)) {
-            openGuiCommand.setExecutor(new OpenGuiCommand(guiManager));
+            openGuiCommand.setExecutor(openGuiCommandExecutor);
             openGuiCommand.setTabCompleter(new OpenGuiTabCompleter(guiManager));
         }
 
@@ -89,4 +98,5 @@ public final class QuickGUI extends JavaPlugin {
         }
 
     }
+
 }

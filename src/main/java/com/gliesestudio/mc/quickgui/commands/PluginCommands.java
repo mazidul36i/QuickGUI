@@ -45,7 +45,9 @@ public interface PluginCommands {
     enum SystemCommand {
         CHANGE_NAME("change name", AwaitingInputType.INPUT_NAME),
         CHANGE_TITLE("change title", AwaitingInputType.INPUT_TITLE),
-        CHANGE_ROWS("change rows", AwaitingInputType.INPUT_ROW);
+        CHANGE_ROWS("change rows", AwaitingInputType.INPUT_ROW),
+        CHANGE_PERMISSION("change permission", AwaitingInputType.INPUT_PERMISSION),
+        CHANGE_ALIAS("change alias", AwaitingInputType.INPUT_ALIAS);
 
         private final String command;
         private final AwaitingInputType inputType;

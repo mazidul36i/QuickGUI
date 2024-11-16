@@ -105,7 +105,7 @@ items:
       - "&7Change the open permission "
       -
       - "&7Current: &a%gui-open-permission%"
-    command: null
+    command: "change permission"
     position:
       row: 2
       column: 5
@@ -118,7 +118,7 @@ items:
       - "&fExample: &7/opengui warps &8-> &7/warps"
       -
       - "&7Current: &a%gui_alias%"
-    command: null
+    command: "change alias"
     position:
       row: 2
       column: 6

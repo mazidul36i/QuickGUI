@@ -4,6 +4,7 @@ import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
 import com.gliesestudio.mc.quickgui.enums.CommandExecutor;
 import com.gliesestudio.mc.quickgui.enums.ItemStackType;
+import com.gliesestudio.mc.quickgui.executor.GuiAliasCommand;
 import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
 import com.gliesestudio.mc.quickgui.model.GuiItem;
 import com.gliesestudio.mc.quickgui.placeholder.PlaceholderHelper;
@@ -11,8 +12,11 @@ import com.gliesestudio.mc.quickgui.placeholder.SystemPlaceholder;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
@@ -26,10 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public class GuiManager {
 
@@ -39,6 +41,7 @@ public class GuiManager {
 
     private final QuickGUI plugin;
     private final Map<String, QuickGuiHolder> guis = new HashMap<>();
+    private final Map<String, QuickGuiHolder> aliases = new HashMap<>();
     private final File guiFolder;
 
     public GuiManager(@NotNull QuickGUI plugin) {
@@ -72,6 +75,7 @@ public class GuiManager {
     private int loadGuis() {
         log.info("Loading GUIs...");
         guis.clear();
+        aliases.clear();
 
         File[] guiFiles = guiFolder.listFiles();
         if (guiFiles == null || guiFiles.length == 0) {
@@ -84,12 +88,15 @@ public class GuiManager {
             QuickGuiHolder guiHolder = createGuiFromFile(guiFile, null);
             if (guiHolder == null) continue;
             guis.put(guiHolder.getName(), guiHolder);
+            if (guiHolder.getAlias() != null) aliases.put(guiHolder.getAlias(), guiHolder);
         }
+
+        // Register aliases
+        registerGuiAliases(aliases);
 
         log.info("Loaded guis: {}", guis.size());
         return guis.size();
     }
-
 
     @Nullable
     public QuickGuiHolder createGuiFromFile(@NotNull File guiFile, PluginCommands.Action action) {
@@ -108,13 +115,16 @@ public class GuiManager {
         // Get the title and rows from the configuration
         String name = guiConfig.getString("name", "unknown");
         String titleText = guiConfig.getString("title", "Custom GUI");
+        String alias = guiConfig.getString("alias");
+        String permission = guiConfig.getString("permission");
+        int rows = guiConfig.getInt("rows", 3);
+
         TextComponent title = Component.text(PluginUtils.translateColorCodes(
                 PlaceholderHelper.parseValue(titleText, SystemPlaceholder.GUI_NAME, name)
         ));
-        int rows = guiConfig.getInt("rows", 3);
 
         // Create an inventory for the GUI
-        QuickGuiHolder guiHolder = new QuickGuiHolder(plugin, rows, title, name, action);
+        QuickGuiHolder guiHolder = new QuickGuiHolder(plugin, rows, title, name, action, alias, permission);
         Inventory gui = guiHolder.getInventory();
 
         List<GuiItem> guiItems = loadItemsFromConfig(guiConfig);
@@ -212,6 +222,7 @@ public class GuiManager {
     }
 
     public int reloadGuis() {
+        registerGuiAliases(aliases.keySet());
         return loadGuis();
     }
 
@@ -226,6 +237,43 @@ public class GuiManager {
 
     public List<String> getGuiNames() {
         return guis.keySet().stream().toList();
+    }
+
+    // Register each alias as a command dynamically
+    private void registerGuiAliases(Map<String, QuickGuiHolder> aliases) {
+        CommandMap commandMap = getCommandMap();
+        if (commandMap != null) {
+            aliases.forEach((alias, guiHolder) -> {
+                GuiAliasCommand aliasCommand = new GuiAliasCommand(this, alias, guiHolder.getName(),
+                        guiHolder.getPermission());
+                commandMap.register(PluginCommands.QUICK_GUI, aliasCommand);
+            });
+        }
+    }
+
+    private void registerGuiAliases(Set<String> aliases) {
+        CommandMap commandMap = getCommandMap();
+        if (!(commandMap instanceof SimpleCommandMap simpleCommandMap)) return;
+        // Unregister each alias commands
+        aliases.forEach(alias -> {
+            simpleCommandMap.getKnownCommands().remove(PluginCommands.QUICK_GUI + ":" + alias);
+            simpleCommandMap.getKnownCommands().remove(alias);
+        });
+
+//        Bukkit.getOnlinePlayers().forEach(Player::updateCommands); // TODO: not implemented yet
+    }
+
+    // Reflect to access Bukkit's command map
+    @Nullable
+    private CommandMap getCommandMap() {
+        try {
+            Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            commandMapField.setAccessible(true);
+            return (CommandMap) commandMapField.get(Bukkit.getServer());
+        } catch (Exception e) {
+            log.error("Error getting command map", e);
+            return null;
+        }
     }
 
 }

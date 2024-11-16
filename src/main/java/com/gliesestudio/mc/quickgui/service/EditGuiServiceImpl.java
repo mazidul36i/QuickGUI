@@ -42,13 +42,13 @@ public class EditGuiServiceImpl implements EditGuiService {
     }
 
     @Override
-    public boolean createGui(@NotNull CommandSender sender, String name, int rows) {
+    public void createGui(@NotNull CommandSender sender, String name, int rows) {
         // Create the GUI file
         File guiFile = new File(plugin.getDataFolder() + "/guis", name + ".yml");
         // Verify if any GUI with the same name already exists.
         if (guiFile.exists()) {
             sender.sendMessage("§cA GUI with the name '§r" + name + "§c' already exists.");
-            return false;
+            return;
         }
 
         try {
@@ -69,19 +69,22 @@ public class EditGuiServiceImpl implements EditGuiService {
 
                 // Reload GUIs to include the new GUI in the manager
                 guiManager.reloadGuis();
-                return true;
+                return;
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Could not create GUI file for " + name, e);
             sender.sendMessage("§cAn error occurred while creating the GUI.");
         }
-
-        return false;
     }
 
     @Override
     public void reloadGui(String name) {
         guiManager.reloadGui(name);
+    }
+
+    @Override
+    public void reloadGuis() {
+        guiManager.reloadGuis();
     }
 
     @Override
@@ -126,23 +129,28 @@ public class EditGuiServiceImpl implements EditGuiService {
 
     @Override
     public boolean editGuiTitle(String name, String newTitle) {
-        File guiConfigFile = new File(guiFolder, name + ".yml");
-        FileConfiguration guiConfig = YamlConfiguration.loadConfiguration(guiConfigFile);
-        guiConfig.set("title", newTitle);
-
-        try {
-            guiConfig.save(guiConfigFile);
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
+        return setConfig(name, "title", newTitle);
     }
 
     @Override
     public boolean editGuiRows(String name, int newRows) {
+        return setConfig(name, "rows", newRows);
+    }
+
+    @Override
+    public boolean editGuiPermission(String name, String newPermission) {
+        return setConfig(name, "permission", newPermission);
+    }
+
+    @Override
+    public boolean editGuiAlias(String name, String newAlias) {
+        return setConfig(name, "alias", newAlias);
+    }
+
+    private boolean setConfig(String name, String key, Object newValue) {
         File guiConfigFile = new File(guiFolder, name + ".yml");
         FileConfiguration guiConfig = YamlConfiguration.loadConfiguration(guiConfigFile);
-        guiConfig.set("rows", newRows);
+        guiConfig.set(key, newValue);
 
         try {
             guiConfig.save(guiConfigFile);
@@ -151,5 +159,4 @@ public class EditGuiServiceImpl implements EditGuiService {
             return false;
         }
     }
-
 }
