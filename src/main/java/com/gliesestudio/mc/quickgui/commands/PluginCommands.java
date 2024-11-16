@@ -1,12 +1,14 @@
 package com.gliesestudio.mc.quickgui.commands;
 
+import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
+
 import javax.annotation.Nullable;
 
 public interface PluginCommands {
 
-    String OPEN_GUI = "gui";
+    String OPEN_GUI = "opengui";
     String QUICK_GUI = "quickgui";
-    String EDIT_GUI = "editgui";
+    String GUI = "gui";
 
     enum Action {
         RELOAD("reload"),
@@ -41,14 +43,16 @@ public interface PluginCommands {
     }
 
     enum SystemCommand {
-        CANCEL("cancel"),
-        CLOSE("close"),
-        DONE("done");
+        CHANGE_NAME("change name", AwaitingInputType.INPUT_NAME),
+        CHANGE_TITLE("change title", AwaitingInputType.INPUT_TITLE),
+        CHANGE_ROWS("change rows", AwaitingInputType.INPUT_ROW);
 
         private final String command;
+        private final AwaitingInputType inputType;
 
-        SystemCommand(String command) {
+        SystemCommand(String command, AwaitingInputType inputType) {
             this.command = command;
+            this.inputType = inputType;
         }
 
         /**
@@ -69,6 +73,10 @@ public interface PluginCommands {
 
         public String getCommand() {
             return command;
+        }
+
+        public AwaitingInputType getInputType() {
+            return inputType;
         }
     }
 

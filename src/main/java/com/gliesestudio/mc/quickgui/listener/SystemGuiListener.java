@@ -4,8 +4,8 @@ import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
 import com.gliesestudio.mc.quickgui.enums.CommandExecutor;
 import com.gliesestudio.mc.quickgui.enums.ItemStackType;
-import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
-import com.gliesestudio.mc.quickgui.manager.GuiManager;
+import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
+import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,27 +17,29 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ListIterator;
 
+public class SystemGuiListener implements Listener {
 
-public class GuiListener implements Listener {
+    private static final Logger log = LoggerFactory.getLogger(SystemGuiListener.class);
+    private final QuickGUI plugin;
 
-    private static final Logger log = LoggerFactory.getLogger(GuiListener.class);
-    private final GuiManager guiManager;
+    private final SystemGuiManager systemGuiManager;
+    private final ChatListener chatListener;
 
-    public GuiListener(GuiManager guiManager, QuickGUI plugin) {
-        this.guiManager = guiManager;
+    public SystemGuiListener(QuickGUI plugin, SystemGuiManager systemGuiManager, ChatListener chatListener) {
+        this.plugin = plugin;
+        this.systemGuiManager = systemGuiManager;
+        this.chatListener = chatListener;
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Inventory clickedInventory = event.getClickedInventory();
         if (clickedInventory == null ||
-                !(clickedInventory.getHolder(false) instanceof QuickGuiHolder holder) ||
+                !(clickedInventory.getHolder(false) instanceof SystemGuiHolder holder) ||
                 !(event.getWhoClicked() instanceof Player player)
         ) {
             // It's not our inventory, ignore it.
@@ -66,21 +68,20 @@ public class GuiListener implements Listener {
 
             // Fetch the command from the item meta.
             PersistentDataContainer dataContainer = currentItem.getItemMeta().getPersistentDataContainer();
-            command = dataContainer.get(guiManager.COMMAND_KEY(), PersistentDataType.STRING);
-            commandExecutor = CommandExecutor.fromString(dataContainer.get(guiManager.COMMAND_EXECUTOR_KEY(), PersistentDataType.STRING));
+            command = dataContainer.get(systemGuiManager.COMMAND_KEY(), PersistentDataType.STRING);
+            commandExecutor = CommandExecutor.fromString(dataContainer.get(systemGuiManager.COMMAND_EXECUTOR_KEY(), PersistentDataType.STRING));
         }
 
         if (PluginCommands.Action.EDIT.equals(holder.getAction()))
-            handleAdminGuiClick(event, player, clickedInventory, command, itemStackType);
+            handleAdminGuiClick(holder, player, clickedInventory, command, itemStackType);
         else {
             event.setCancelled(true); // Prevent players from taking items
-            handleUserGuiClick(player, commandExecutor, command);
+            handleGuiClick(player, commandExecutor, command);
         }
     }
 
-    private void handleUserGuiClick(Player player, CommandExecutor commandExecutor, String command) {
+    private void handleGuiClick(Player player, CommandExecutor commandExecutor, String command) {
         if (command == null) return;
-        log.info("Command: {}", command);
         log.info("Executing command by {}: {}", commandExecutor, command);
 
         command = PluginUtils.replacePlaceholders(command, player);
@@ -91,11 +92,20 @@ public class GuiListener implements Listener {
         }
     }
 
-    private void handleAdminGuiClick(InventoryClickEvent event, Player player, Inventory clickedInventory, String command, ItemStackType itemStackType) {
+    private void handleAdminGuiClick(SystemGuiHolder systemGuiHolder, Player player, Inventory clickedInventory,
+                                     String command, ItemStackType itemStackType) {
         log.info("Item stack type: {}, command: {}", itemStackType, command);
         if (ItemStackType.SYSTEM_BUTTON.equals(itemStackType)) {
             PluginCommands.SystemCommand systemCommand = PluginCommands.SystemCommand.fromString(command);
-            log.info("system command: {}", systemCommand);
+
+            // On click input commands
+            if (systemCommand != null && systemCommand.getInputType() != null) {
+                log.info("Awaiting {} input for player: {}", systemCommand.getInputType(), player.getUniqueId());
+                chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder);
+                player.closeInventory();
+                return;
+            }
+
         }
     }
 

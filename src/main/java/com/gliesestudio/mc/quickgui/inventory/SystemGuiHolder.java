@@ -3,29 +3,29 @@ package com.gliesestudio.mc.quickgui.inventory;
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 
-public class QuickGuiHolder implements InventoryHolder {
+public class SystemGuiHolder implements InventoryHolder {
 
-    private final Inventory inventory;
+    private final Inventory systemInventory;
     private final PluginCommands.Action action;
     private final String name;
-    private final TextComponent title;
+    private final QuickGuiHolder editGuiHolder;
 
-    public QuickGuiHolder(QuickGUI plugin, int rows, TextComponent title, String name, PluginCommands.Action action) {
+    public SystemGuiHolder(QuickGUI plugin, int rows, Component title, String name, QuickGuiHolder editGuiHolder,
+                           PluginCommands.Action action) {
         // Create an Inventory with 9 slots, `this` here is our InventoryHolder.
-        this.inventory = plugin.getServer().createInventory(this, rows * 9, title);
+        this.systemInventory = plugin.getServer().createInventory(this, rows * 9, title);
         this.name = name;
-        this.title = title;
+        this.editGuiHolder = editGuiHolder;
         this.action = action;
     }
 
     @Override
     public @NotNull Inventory getInventory() {
-        return this.inventory;
+        return this.systemInventory;
     }
 
     public PluginCommands.Action getAction() {
@@ -36,7 +36,8 @@ public class QuickGuiHolder implements InventoryHolder {
         return name;
     }
 
-    public TextComponent getTitle() {
-        return title;
+    public QuickGuiHolder getEditGuiHolder() {
+        return editGuiHolder;
     }
+
 }

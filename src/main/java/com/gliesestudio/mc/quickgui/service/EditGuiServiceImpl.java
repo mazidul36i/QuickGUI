@@ -2,12 +2,14 @@ package com.gliesestudio.mc.quickgui.service;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
+import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
+import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.manager.GuiManager;
+import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +28,17 @@ public class EditGuiServiceImpl implements EditGuiService {
     private final QuickGUI plugin;
 
     private final GuiManager guiManager;
+    private final SystemGuiManager systemGuiManager;
 
-    public EditGuiServiceImpl(QuickGUI plugin, GuiManager guiManager) {
+    private final File guiFolder;
+
+    public EditGuiServiceImpl(QuickGUI plugin, GuiManager guiManager, SystemGuiManager systemGuiManager) {
         this.logger = plugin.getLogger();
         this.plugin = plugin;
         this.guiManager = guiManager;
+        this.systemGuiManager = systemGuiManager;
+
+        this.guiFolder = new File(plugin.getDataFolder(), "guis");
     }
 
     @Override
@@ -47,6 +55,7 @@ public class EditGuiServiceImpl implements EditGuiService {
             // If the file doesn't exist, create it and add initial configuration
             if (guiFile.createNewFile()) {
                 FileConfiguration guiConfig = YamlConfiguration.loadConfiguration(guiFile);
+                guiConfig.set("name", name);
                 guiConfig.set("title", name);
                 guiConfig.set("rows", rows);
                 guiConfig.set("items", new ArrayList<>());
@@ -71,19 +80,76 @@ public class EditGuiServiceImpl implements EditGuiService {
     }
 
     @Override
-    public boolean editGui(@NotNull Player player, String name) {
-        // Create the GUI file and prepare GUI.
-        File guiFile = new File(plugin.getDataFolder(), "guis/" + name + ".yml");
-        Inventory gui = guiManager.createGuiFromYml(guiFile, name, PluginCommands.Action.EDIT);
+    public void reloadGui(String name) {
+        guiManager.reloadGui(name);
+    }
 
-        // Verify if any GUI exists with the name.
-        if (gui == null) {
+    @Override
+    public boolean editGui(@NotNull Player player, String name) {
+        QuickGuiHolder editGuiHolder = guiManager.getGui(name);
+        if (editGuiHolder == null) {
             player.sendMessage("§cNo GUI with the name '§r" + name + "§c' exists.");
             return true;
         }
 
+        // Create the GUI from system resources
+        SystemGuiHolder systemGuiHolder = systemGuiManager.createGuiFromSystemResource("edit-gui", editGuiHolder,
+                PluginCommands.Action.EDIT);
+
+        // Verify if any GUI exists with the name.
+        if (systemGuiHolder == null) {
+            player.sendMessage("§cCouldn't load system edit gui for '§r" + name);
+            return true;
+        }
+
         // Open the GUI
-        player.openInventory(gui);
+        player.openInventory(systemGuiHolder.getInventory());
         return true;
     }
+
+    @Override
+    public boolean editGuiName(String name, String newName) {
+        File guiConfigFile = new File(guiFolder, name + ".yml");
+        File renameToFile = new File(guiFolder, newName + ".yml");
+        FileConfiguration guiConfig = YamlConfiguration.loadConfiguration(guiConfigFile);
+        guiConfig.set("name", newName);
+
+        try {
+            if (guiConfigFile.renameTo(renameToFile)) {
+                guiConfig.save(renameToFile);
+                return true;
+            }
+        } catch (IOException ignored) {
+        }
+        return false;
+    }
+
+    @Override
+    public boolean editGuiTitle(String name, String newTitle) {
+        File guiConfigFile = new File(guiFolder, name + ".yml");
+        FileConfiguration guiConfig = YamlConfiguration.loadConfiguration(guiConfigFile);
+        guiConfig.set("title", newTitle);
+
+        try {
+            guiConfig.save(guiConfigFile);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean editGuiRows(String name, int newRows) {
+        File guiConfigFile = new File(guiFolder, name + ".yml");
+        FileConfiguration guiConfig = YamlConfiguration.loadConfiguration(guiConfigFile);
+        guiConfig.set("rows", newRows);
+
+        try {
+            guiConfig.save(guiConfigFile);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
 }

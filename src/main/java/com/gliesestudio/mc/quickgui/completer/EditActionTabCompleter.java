@@ -65,7 +65,7 @@ public class EditActionTabCompleter implements TabCompleter {
         // Suggestion list.
         List<String> suggestions = new ArrayList<>();
 
-        if (!StringUtils.equals(command.getName(), PluginCommands.EDIT_GUI)) {
+        if (!StringUtils.equals(command.getName(), PluginCommands.GUI)) {
             log.debug("Registered wrong command for EditActionTabCompleter: {}", command);
             return suggestions;
         }
@@ -82,6 +82,13 @@ public class EditActionTabCompleter implements TabCompleter {
             PluginCommands.Action action = PluginCommands.Action.fromString(args[0]);
             if (PluginCommands.Action.EDIT.equals(action)) {
                 suggestions.addAll(guiManager.getGuiNames());
+            }
+        }
+
+        if (args.length == 3) {
+            PluginCommands.Action action = PluginCommands.Action.fromString(args[0]);
+            if (PluginCommands.Action.CREATE.equals(action)) {
+                suggestions.addAll(List.of("1", "2", "3", "4", "5", "6"));
             }
         }
 

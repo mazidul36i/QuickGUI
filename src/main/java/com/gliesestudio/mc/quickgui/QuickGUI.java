@@ -5,9 +5,15 @@ import com.gliesestudio.mc.quickgui.completer.EditActionTabCompleter;
 import com.gliesestudio.mc.quickgui.completer.OpenGuiTabCompleter;
 import com.gliesestudio.mc.quickgui.executor.EditGuiActionExecutor;
 import com.gliesestudio.mc.quickgui.executor.OpenGuiCommand;
+import com.gliesestudio.mc.quickgui.listener.ChatListener;
 import com.gliesestudio.mc.quickgui.listener.GuiListener;
+import com.gliesestudio.mc.quickgui.listener.SystemGuiListener;
 import com.gliesestudio.mc.quickgui.manager.GuiManager;
+import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
+import com.gliesestudio.mc.quickgui.service.EditGuiService;
+import com.gliesestudio.mc.quickgui.service.EditGuiServiceImpl;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
@@ -18,15 +24,27 @@ public final class QuickGUI extends JavaPlugin {
     private final Logger logger = getLogger();
 
     private GuiManager guiManager;
+    private SystemGuiManager systemGuiManager;
+
+    // Listeners
+    private ChatListener chatListener;
+
+    // Services
+    private EditGuiService editGuiService;
 
     @Override
     public void onEnable() {
         displayStartingMessage();
-
         saveDefaultConfig();
-        guiManager = new GuiManager(this);
-        getServer().getPluginManager().registerEvents(new GuiListener(guiManager, this), this);
 
+        guiManager = new GuiManager(this);
+        systemGuiManager = new SystemGuiManager(this);
+
+        editGuiService = new EditGuiServiceImpl(this, guiManager, systemGuiManager);
+
+        chatListener = new ChatListener(this, editGuiService);
+
+        registerEvents();
         registerCommands();
     }
 
@@ -41,6 +59,18 @@ public final class QuickGUI extends JavaPlugin {
         logger.info("\u001B[32m╚═══════════════════════════════╝\u001B[0m");
     }
 
+    private void registerEvents() {
+        // Get the plugin manager
+        PluginManager pluginManager = getServer().getPluginManager();
+
+        // Register gui click listener
+        pluginManager.registerEvents(new GuiListener(guiManager, this), this);
+        pluginManager.registerEvents(new SystemGuiListener(this, systemGuiManager, chatListener), this);
+
+        // Register the chat listener
+        pluginManager.registerEvents(chatListener, this);
+    }
+
     private void registerCommands() {
         logger.info("Registering commands...");
 
@@ -52,9 +82,9 @@ public final class QuickGUI extends JavaPlugin {
         }
 
         // Register the EditGuiCommand
-        PluginCommand editGuiCommand = getCommand(PluginCommands.EDIT_GUI);
+        PluginCommand editGuiCommand = getCommand(PluginCommands.GUI);
         if (Objects.nonNull(editGuiCommand)) {
-            editGuiCommand.setExecutor(new EditGuiActionExecutor(this, guiManager));
+            editGuiCommand.setExecutor(new EditGuiActionExecutor(this, guiManager, systemGuiManager));
             editGuiCommand.setTabCompleter(new EditActionTabCompleter(guiManager));
         }
 

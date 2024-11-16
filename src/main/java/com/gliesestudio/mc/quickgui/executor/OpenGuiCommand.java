@@ -1,11 +1,11 @@
 package com.gliesestudio.mc.quickgui.executor;
 
+import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
 import com.gliesestudio.mc.quickgui.manager.GuiManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public class OpenGuiCommand implements CommandExecutor {
@@ -33,14 +33,14 @@ public class OpenGuiCommand implements CommandExecutor {
         String guiName = args[0];
 
         // Retrieve the GUI from the GuiManager
-        Inventory gui = guiManager.getGui(guiName);
-        if (gui == null) {
+        QuickGuiHolder guiHolder = guiManager.getGui(guiName);
+        if (guiHolder == null) {
             player.sendMessage("GUI with the name '" + guiName + "' does not exist.");
             return true;
         }
 
         // Open the GUI for the player
-        player.openInventory(gui);
+        player.openInventory(guiHolder.getInventory());
         return true;
     }
 

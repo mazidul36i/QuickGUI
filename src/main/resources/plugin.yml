@@ -12,22 +12,20 @@ permissions:
     description: Permission to execute action commands like create, edit, delete, reload, etc for QuickGUI.
     default: op
 
-  quickgui.gui:
+  quickgui.opengui:
     description: Open a custom GUI
     default: true
 
 
 commands:
-  editgui:
+  gui:
     description: Execute specific actions for QuickGUI like create, edit, delete, reload, etc.
-    usage: /editgui <action>
+    usage: /gui <action>
     permission: quickgui.admin
     permission-message: "You don't have permission to use this command."
-    aliases:
-      - egui
 
-  gui:
+  opengui:
     description: Opens a custom GUI for the player
-    usage: /gui <guiName>
-    permission: quickgui.gui
+    usage: /opengui <gui_name>
+    permission: quickgui.opengui
     permission-message: "You don't have permission to open this GUI."

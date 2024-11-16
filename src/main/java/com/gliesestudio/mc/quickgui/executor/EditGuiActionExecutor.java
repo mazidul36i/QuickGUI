@@ -3,6 +3,7 @@ package com.gliesestudio.mc.quickgui.executor;
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
 import com.gliesestudio.mc.quickgui.manager.GuiManager;
+import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
 import com.gliesestudio.mc.quickgui.service.EditGuiServiceImpl;
 import org.bukkit.command.Command;
@@ -17,10 +18,10 @@ public class EditGuiActionExecutor implements CommandExecutor {
     private final GuiManager guiManager;
     private final EditGuiService editGuiService;
 
-    public EditGuiActionExecutor(QuickGUI plugin, GuiManager guiManager) {
+    public EditGuiActionExecutor(QuickGUI plugin, GuiManager guiManager, SystemGuiManager systemGuiManager) {
         this.plugin = plugin;
         this.guiManager = guiManager;
-        editGuiService = new EditGuiServiceImpl(plugin, guiManager);
+        editGuiService = new EditGuiServiceImpl(plugin, guiManager, systemGuiManager);
     }
 
     @Override
@@ -47,7 +48,8 @@ public class EditGuiActionExecutor implements CommandExecutor {
 
         // Execute the 'create' action
         if (PluginCommands.Action.CREATE.equals(action)) {
-            return createGui(sender, args);
+            createGui(sender, args);
+            return true;
         }
 
         // Execute the 'edit' action
@@ -74,10 +76,10 @@ public class EditGuiActionExecutor implements CommandExecutor {
             sender.sendMessage("§aLoaded " + guiSize + " GUI" + (guiSize == 1 ? "" : "s") + ".");
     }
 
-    private boolean createGui(@NotNull CommandSender sender, String @NotNull [] args) {
+    private void createGui(@NotNull CommandSender sender, String @NotNull [] args) {
         if (args.length <= 1) {
             sender.sendMessage("§cPlease specify the name of the GUI to create.");
-            return false;
+            return;
         }
         String name = args[1];
         int rows = 3;
@@ -88,22 +90,24 @@ public class EditGuiActionExecutor implements CommandExecutor {
                 rows = Integer.parseInt(args[2]);
                 if (rows < 1 || rows > 6) {
                     sender.sendMessage("§cRow count must be between 1 and 6.");
-                    return false;
+                    return;
                 }
             } catch (NumberFormatException e) {
                 sender.sendMessage("§cInvalid row count. Please provide a number between 1 and 6.");
-                return false;
+                return;
             }
         }
 
         // Create gui with the name of rows.
-        return editGuiService.createGui(sender, name, rows);
+        editGuiService.createGui(sender, name, rows);
+        // Open edit GUI if the sender is a player
+        if (sender instanceof Player player) editGuiService.editGui(player, name);
     }
 
     private boolean editGui(@NotNull Player player, String @NotNull [] args) {
         if (args.length <= 1) {
             player.sendMessage("§cPlease specify the name of the GUI to edit.");
-            return false;
+            return true;
         }
         String name = args[1];
 

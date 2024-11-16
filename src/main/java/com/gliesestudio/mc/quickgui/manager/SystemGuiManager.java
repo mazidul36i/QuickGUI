@@ -5,12 +5,12 @@ import com.gliesestudio.mc.quickgui.commands.PluginCommands;
 import com.gliesestudio.mc.quickgui.enums.CommandExecutor;
 import com.gliesestudio.mc.quickgui.enums.ItemStackType;
 import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
+import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.model.GuiItem;
 import com.gliesestudio.mc.quickgui.placeholder.PlaceholderHelper;
 import com.gliesestudio.mc.quickgui.placeholder.SystemPlaceholder;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -25,37 +25,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GuiManager {
+public class SystemGuiManager {
 
-    private static final Logger log = LoggerFactory.getLogger(GuiManager.class);
+    private static final Logger log = LoggerFactory.getLogger(SystemGuiManager.class);
     private final NamespacedKey COMMAND_KEY;
     private final NamespacedKey COMMAND_EXECUTOR_KEY;
 
     private final QuickGUI plugin;
-    private final Map<String, QuickGuiHolder> guis = new HashMap<>();
-    private final File guiFolder;
 
-    public GuiManager(@NotNull QuickGUI plugin) {
+    public SystemGuiManager(@NotNull QuickGUI plugin) {
         this.COMMAND_KEY = new NamespacedKey(plugin, "gui_command");
         this.COMMAND_EXECUTOR_KEY = new NamespacedKey(plugin, "gui_command_executor");
-
         this.plugin = plugin;
-        this.guiFolder = new File(plugin.getDataFolder(), "guis");
-
-        // Ensure the guis folder exists
-        if (!guiFolder.exists() && !guiFolder.mkdirs()) {
-            log.error("Failed to create 'guis' folder. Shutting down QuickQUI!");
-            return;
-        }
-
-        // Load GUIs from individual files
-        loadGuis();
     }
 
     public @NotNull NamespacedKey COMMAND_KEY() {
@@ -66,85 +53,63 @@ public class GuiManager {
         return this.COMMAND_EXECUTOR_KEY;
     }
 
-    /**
-     * Loads all GUI definitions from the configuration file.
-     */
-    private int loadGuis() {
-        log.info("Loading GUIs...");
-        guis.clear();
-
-        File[] guiFiles = guiFolder.listFiles();
-        if (guiFiles == null || guiFiles.length == 0) {
-            log.info("No GUI files found!");
-            return 0;
-        }
-
-        // Loop through each file in the guis folder
-        for (File guiFile : guiFiles) {
-            QuickGuiHolder guiHolder = createGuiFromFile(guiFile, null);
-            if (guiHolder == null) continue;
-            guis.put(guiHolder.getName(), guiHolder);
-        }
-
-        log.info("Loaded guis: {}", guis.size());
-        return guis.size();
-    }
-
-
     @Nullable
-    public QuickGuiHolder createGuiFromFile(@NotNull File guiFile, PluginCommands.Action action) {
-        log.info("Loading gui config from file: {}", guiFile.getName());
-        if (!(guiFile.exists() && guiFile.isFile() && guiFile.getName().endsWith(".yml"))) {
-            log.warn("Invalid file format. Skipping");
+    public SystemGuiHolder createGuiFromSystemResource(@NotNull String name, @NotNull QuickGuiHolder editGuiHolder, PluginCommands.Action action) {
+        // Read file from resources
+        String filePath = "guis/system/" + name + ".yml";
+
+        // Load the file from resources
+        InputStream stream = plugin.getResource(filePath);
+        if (stream == null) {
+            log.error("Could not find file in resources: {}", filePath);
             return null;
         }
 
-        // Create the GUI from the file
-        FileConfiguration configuration = YamlConfiguration.loadConfiguration(guiFile);
-        return createGuiFromYml(configuration, action);
+        // Create the GUI from the input stream
+        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(new InputStreamReader(stream));
+        return createGuiFromYml(configuration, editGuiHolder, action);
     }
 
-    public @NotNull QuickGuiHolder createGuiFromYml(@NotNull FileConfiguration guiConfig, PluginCommands.Action action) {
+    public @NotNull SystemGuiHolder createGuiFromYml(@NotNull FileConfiguration guiConfig, @NotNull QuickGuiHolder editGuiHolder,
+                                                     PluginCommands.Action action) {
+        Map<String, String> placeholders = Map.of(
+                SystemPlaceholder.GUI_NAME, editGuiHolder.getName(),
+                SystemPlaceholder.GUI_TITLE, editGuiHolder.getTitle().content(),
+                SystemPlaceholder.GUI_ROWS, String.valueOf(editGuiHolder.getInventory().getSize() / 9),
+                SystemPlaceholder.GUI_OPEN_PERMISSION, "NONE", // TODO: not implemented yet
+                SystemPlaceholder.GUI_ALIAS, "NONE" // TODO: not implemented yet
+        );
+
         // Get the title and rows from the configuration
         String name = guiConfig.getString("name", "unknown");
-        String titleText = guiConfig.getString("title", "Custom GUI");
-        TextComponent title = Component.text(PluginUtils.translateColorCodes(
-                PlaceholderHelper.parseValue(titleText, SystemPlaceholder.GUI_NAME, name)
+        String titleText = guiConfig.getString("title", "System GUI");
+        Component title = Component.text(PluginUtils.translateColorCodes(
+                PlaceholderHelper.parseValues(titleText, placeholders)
         ));
         int rows = guiConfig.getInt("rows", 3);
 
         // Create an inventory for the GUI
-        QuickGuiHolder guiHolder = new QuickGuiHolder(plugin, rows, title, name, action);
-        Inventory gui = guiHolder.getInventory();
+        SystemGuiHolder guiHolder = new SystemGuiHolder(plugin, rows, title, name, editGuiHolder, action);
+        Inventory systemGui = guiHolder.getInventory();
 
         List<GuiItem> guiItems = loadItemsFromConfig(guiConfig);
-
-        log.info("Items list count for gui: {}", guiItems.size());
+        log.info("Items list count for the system gui: {}", guiItems.size());
         for (GuiItem guiItem : guiItems) {
             int slot = (guiItem.getRow() - 1) * 9 + (guiItem.getColumn() - 1);
-            if (slot < 0 || slot >= gui.getSize()) continue;
+            if (slot < 0 || slot >= systemGui.getSize()) continue;
 
             // Prepare item stack and add it to the GUI
-            ItemStack itemStack = prepareItemStack(guiItem, name, titleText, rows);
-            gui.setItem(slot, itemStack);
+            ItemStack itemStack = prepareItemStack(guiItem, placeholders);
+            systemGui.setItem(slot, itemStack);
         }
 
         return guiHolder;
     }
 
-    private @NotNull ItemStack prepareItemStack(GuiItem guiItem, String guiName, String guiTitle, int guiRows) {
+    private @NotNull ItemStack prepareItemStack(GuiItem guiItem, Map<String, String> placeholders) {
         ItemStack itemStack = new ItemStack(guiItem.getItem());
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
-            // Create all required placeholders
-            Map<String, String> placeholders = Map.of(
-                    SystemPlaceholder.GUI_NAME, guiName,
-                    SystemPlaceholder.GUI_TITLE, guiTitle,
-                    SystemPlaceholder.GUI_ROWS, String.valueOf(guiRows),
-                    SystemPlaceholder.GUI_OPEN_PERMISSION, "NONE", // TODO: not implemented yet
-                    SystemPlaceholder.GUI_ALIAS, "NONE" // TODO: not implemented yet
-            );
-
             // Set display name
             if (guiItem.getDisplayName() != null) {
                 meta.displayName(Component.text(PluginUtils.translateColorCodes(guiItem.getDisplayName())));
@@ -209,23 +174,6 @@ public class GuiManager {
             items.add(guiItem);
         }
         return items;
-    }
-
-    public int reloadGuis() {
-        return loadGuis();
-    }
-
-    public void reloadGui(String name) {
-        QuickGuiHolder guiHolder = createGuiFromFile(new File(guiFolder, name + ".yml"), null);
-        if (guiHolder != null) guis.put(name, guiHolder);
-    }
-
-    public QuickGuiHolder getGui(String name) {
-        return guis.get(name);
-    }
-
-    public List<String> getGuiNames() {
-        return guis.keySet().stream().toList();
     }
 
 }

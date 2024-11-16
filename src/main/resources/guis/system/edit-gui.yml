@@ -1,0 +1,206 @@
+name: edit-gui
+title: "&5GUI: &r%gui-name%"
+rows: 3
+
+# List of items in the GUI.
+items:
+  # Row 1
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 1
+      column: 1
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 1
+      column: 2
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 1
+      column: 3
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 1
+      column: 4
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 1
+      column: 5
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 1
+      column: 6
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 1
+      column: 7
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 1
+      column: 8
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 1
+      column: 9
+
+  # Row 2
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 2
+      column: 1
+
+  - item: "COMMAND_BLOCK"
+    type: "system_button"
+    display-name: "&bChange Name"
+    lore:
+      - "&7Change the name of this GUI"
+      - "&7/opengui &f<Name>"
+      -
+      - "&cNot the Title of the GUI"
+      - "&7Current: &a%gui-name%"
+    command: "change name"
+    position:
+      row: 2
+      column: 2
+
+  - item: "IRON_HELMET"
+    type: "system_button"
+    display-name: "&bChange Title"
+    lore:
+      - "&7Change the Title of this GUI"
+      -
+      - "&7Current: &8%gui-title%"
+    command: "change title"
+    position:
+      row: 2
+      column: 3
+
+  - item: "OAK_SAPLING"
+    type: "system_button"
+    display-name: "&bChange Size"
+    lore:
+      - "&7Resize the Inventory Rows (Max 6)"
+      - "&8>> 1 row = 9 inventory size"
+      -
+      - "&cItems out of size will be deleted"
+      - "&7Current: &a%gui-rows%"
+    command: "change rows"
+    position:
+      row: 2
+      column: 4
+
+  - item: "GOLDEN_HORSE_ARMOR"
+    type: "system_button"
+    display-name: "&bChange Permission"
+    lore:
+      - "&7Change the open permission "
+      -
+      - "&7Current: &a%gui-open-permission%"
+    command: null
+    position:
+      row: 2
+      column: 5
+
+  - item: "POPPY"
+    type: "system_button"
+    display-name: "&bChange Command Alias"
+    lore:
+      - "&7Change the command alias"
+      - "&fExample: &7/opengui warps &8-> &7/warps"
+      -
+      - "&7Current: &a%gui_alias%"
+    command: null
+    position:
+      row: 2
+      column: 6
+
+  - item: "PLAYER_HEAD"
+    type: "system_button"
+    display-name: "Player Head"
+    command: null
+    position:
+      row: 2
+      column: 7
+
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 2
+      column: 8
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 2
+      column: 9
+
+  # Row 3
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 3
+      column: 1
+
+  - item: "OAK_SLAB"
+    type: "system_button"
+    display-name: "Oak Slab"
+    command: null
+    position:
+      row: 3
+      column: 2
+
+  - item: "OAK_PLANKS"
+    type: "system_button"
+    display-name: "Oak Planks"
+    command: null
+    position:
+      row: 3
+      column: 3
+
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 3
+      column: 4
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 3
+      column: 5
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 3
+      column: 6
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 3
+      column: 7
+  - item: "GRAY_STAINED_GLASS_PANE"
+    type: "system_filler"
+    position:
+      row: 3
+      column: 8
+
+  - item: "CRAFTING_TABLE"
+    type: "system_button"
+    display-name: "&6&lEdit Items"
+    lore:
+      - "&bLeft Click:"
+      - "&3Move Items"
+      -
+      - "&bRight Click:"
+      - "&3Edit Selected Items"
+    command: null
+    position:
+      row: 3
+      column: 9
