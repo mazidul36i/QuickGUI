@@ -46,6 +46,14 @@
             <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
+
+        <!--    Dev tools    -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.36</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
