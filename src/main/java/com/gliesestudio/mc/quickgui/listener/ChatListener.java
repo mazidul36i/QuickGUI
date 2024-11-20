@@ -43,7 +43,7 @@ public class ChatListener implements Listener {
             log.info("Message: {}", textInput);
 
             AwaitingInputHolder awaitingInputHolder = awaitingInputs.get(player.getUniqueId());
-            String name = awaitingInputHolder.getSystemGuiHolder().getEditGuiHolder().getName();
+            String name = awaitingInputHolder.getSystemGuiHolder().getEditGuiHolder().getGui().getName();
 
             switch (awaitingInputHolder.getInputType()) {
                 case INPUT_NAME -> {

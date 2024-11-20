@@ -1,7 +1,10 @@
 package com.gliesestudio.mc.quickgui.executor;
 
-import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
-import com.gliesestudio.mc.quickgui.manager.GuiManager;
+import com.gliesestudio.mc.quickgui.QuickGUI;
+import com.gliesestudio.mc.quickgui.gui.GUI;
+import com.gliesestudio.mc.quickgui.gui.GuiHolder;
+import com.gliesestudio.mc.quickgui.gui.GuiManager;
+import com.gliesestudio.mc.quickgui.gui.OpenMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,10 +12,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class OpenGuiCommand implements CommandExecutor {
-    private final GuiManager guiManager;
 
-    public OpenGuiCommand(GuiManager guiManager) {
-        this.guiManager = guiManager;
+    private final QuickGUI plugin;
+
+    public OpenGuiCommand(QuickGUI plugin) {
+        this.plugin = plugin;
     }
 
     @Override
@@ -33,17 +37,18 @@ public class OpenGuiCommand implements CommandExecutor {
         String guiName = args[0];
 
         // Retrieve the GUI from the GuiManager
-        QuickGuiHolder guiHolder = guiManager.getGui(guiName);
-        if (guiHolder == null) {
+        GUI gui = GuiManager.getGui(guiName);
+        if (gui == null) {
             player.sendMessage("GUI with the name '" + guiName + "' does not exist.");
             return true;
         }
 
         // Open the GUI for the player
-        if (guiHolder.getPermission() != null && !player.hasPermission(guiHolder.getPermission())) {
+        if (gui.hasPermission() && !player.hasPermission(gui.getPermission())) {
             player.sendMessage("§cYou do not have permission to open this GUI.");
             return true;
         }
+        GuiHolder guiHolder = new GuiHolder(plugin, player, gui, OpenMode.VIEW);
         player.openInventory(guiHolder.getInventory());
         return true;
     }

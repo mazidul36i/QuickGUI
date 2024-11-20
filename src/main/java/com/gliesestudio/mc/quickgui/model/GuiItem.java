@@ -1,6 +1,6 @@
 package com.gliesestudio.mc.quickgui.model;
 
-import com.gliesestudio.mc.quickgui.enums.CommandExecutor;
+import com.gliesestudio.mc.quickgui.gui.command.GuiCommandExecutor;
 import com.gliesestudio.mc.quickgui.enums.ItemStackType;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
@@ -17,13 +17,13 @@ public class GuiItem {
     private int row;
     private int column;
     private ItemStackType itemStackType;
-    private CommandExecutor commandExecutor;
+    private GuiCommandExecutor commandExecutor;
 
     public GuiItem() {
     }
 
     public GuiItem(Material item, String displayName, List<String> lore, String command, int row, int column,
-                   ItemStackType itemStackType, CommandExecutor commandExecutor) {
+                   ItemStackType itemStackType, GuiCommandExecutor commandExecutor) {
         this.item = item;
         this.displayName = displayName;
         this.lore = lore;
@@ -40,7 +40,7 @@ public class GuiItem {
                 .row(row)
                 .column(column)
                 .itemStackType(ItemStackType.SYSTEM_FILLER)
-                .commandExecutor(CommandExecutor.SERVER);
+                .commandExecutor(GuiCommandExecutor.SERVER);
     }
 
     // GuiItem builders
@@ -69,7 +69,7 @@ public class GuiItem {
         return this;
     }
 
-    public GuiItem commandExecutor(CommandExecutor executor) {
+    public GuiItem commandExecutor(GuiCommandExecutor executor) {
         this.commandExecutor = executor;
         return this;
     }
@@ -115,7 +115,7 @@ public class GuiItem {
     }
 
 
-    public CommandExecutor getCommandExecutor() {
+    public GuiCommandExecutor getCommandExecutor() {
         return commandExecutor;
     }
 

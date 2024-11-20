@@ -2,6 +2,7 @@ package com.gliesestudio.mc.quickgui.inventory;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
+import com.gliesestudio.mc.quickgui.gui.GuiHolder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -12,9 +13,9 @@ public class SystemGuiHolder implements InventoryHolder {
     private final Inventory systemInventory;
     private final PluginCommands.Action action;
     private final String name;
-    private final QuickGuiHolder editGuiHolder;
+    private final GuiHolder editGuiHolder;
 
-    public SystemGuiHolder(QuickGUI plugin, int rows, Component title, String name, QuickGuiHolder editGuiHolder,
+    public SystemGuiHolder(QuickGUI plugin, int rows, Component title, String name, GuiHolder editGuiHolder,
                            PluginCommands.Action action) {
         // Create an Inventory with 9 slots, `this` here is our InventoryHolder.
         this.systemInventory = plugin.getServer().createInventory(this, rows * 9, title);
@@ -36,7 +37,7 @@ public class SystemGuiHolder implements InventoryHolder {
         return name;
     }
 
-    public QuickGuiHolder getEditGuiHolder() {
+    public GuiHolder getEditGuiHolder() {
         return editGuiHolder;
     }
 

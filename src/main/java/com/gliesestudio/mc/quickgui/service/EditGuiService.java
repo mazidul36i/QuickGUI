@@ -1,7 +1,11 @@
 package com.gliesestudio.mc.quickgui.service;
 
+import com.gliesestudio.mc.quickgui.gui.GuiHolder;
+import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
+import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public interface EditGuiService {
@@ -24,4 +28,7 @@ public interface EditGuiService {
 
     boolean editGuiAlias(String name, String newAlias);
 
+    void openGuiEditItem(Player player, SystemGuiHolder systemGuiHolder);
+
+    void editGuiItem(Player player, GuiHolder holder, ItemStack itemStack, int slot);
 }

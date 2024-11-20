@@ -2,9 +2,10 @@ package com.gliesestudio.mc.quickgui.manager;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
-import com.gliesestudio.mc.quickgui.enums.CommandExecutor;
+import com.gliesestudio.mc.quickgui.gui.command.GuiCommandExecutor;
 import com.gliesestudio.mc.quickgui.enums.ItemStackType;
-import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
+import com.gliesestudio.mc.quickgui.gui.GUI;
+import com.gliesestudio.mc.quickgui.gui.GuiHolder;
 import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.model.GuiItem;
 import com.gliesestudio.mc.quickgui.placeholder.PlaceholderHelper;
@@ -54,7 +55,7 @@ public class SystemGuiManager {
     }
 
     @Nullable
-    public SystemGuiHolder createGuiFromSystemResource(@NotNull String name, @NotNull QuickGuiHolder editGuiHolder, PluginCommands.Action action) {
+    public SystemGuiHolder createGuiFromSystemResource(@NotNull String name, @NotNull GuiHolder editGuiHolder, PluginCommands.Action action) {
         // Read file from resources
         String filePath = "guis/system/" + name + ".yml";
 
@@ -70,14 +71,15 @@ public class SystemGuiManager {
         return createGuiFromYml(configuration, editGuiHolder, action);
     }
 
-    public @NotNull SystemGuiHolder createGuiFromYml(@NotNull FileConfiguration guiConfig, @NotNull QuickGuiHolder editGuiHolder,
+    public @NotNull SystemGuiHolder createGuiFromYml(@NotNull FileConfiguration guiConfig, @NotNull GuiHolder editGuiHolder,
                                                      PluginCommands.Action action) {
+        GUI editGui = editGuiHolder.getGui();
         Map<String, String> placeholders = Map.of(
-                SystemPlaceholder.GUI_NAME, editGuiHolder.getName(),
-                SystemPlaceholder.GUI_TITLE, editGuiHolder.getTitle().content(),
+                SystemPlaceholder.GUI_NAME, editGui.getName(),
+                SystemPlaceholder.GUI_TITLE, editGui.getTitle(),
                 SystemPlaceholder.GUI_ROWS, String.valueOf(editGuiHolder.getInventory().getSize() / 9),
-                SystemPlaceholder.GUI_OPEN_PERMISSION, editGuiHolder.getPermission() != null ? editGuiHolder.getPermission() : "NONE",
-                SystemPlaceholder.GUI_ALIAS, editGuiHolder.getAlias() != null ? editGuiHolder.getAlias() : "NONE"
+                SystemPlaceholder.GUI_OPEN_PERMISSION, editGui.hasPermission() ? editGui.getPermission() : "NONE",
+                SystemPlaceholder.GUI_ALIAS, editGui.hasAlias() ? editGui.getAlias() : "NONE"
         );
 
         // Get the title and rows from the configuration
@@ -127,7 +129,7 @@ public class SystemGuiManager {
             // Set command into the item meta.
             if (guiItem.getCommand() != null) {
                 PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-                String commandExecutor = guiItem.getCommandExecutor() != null ? guiItem.getCommandExecutor().getExecutor() : CommandExecutor.PLAYER.getExecutor();
+                String commandExecutor = guiItem.getCommandExecutor() != null ? guiItem.getCommandExecutor().getExecutor() : GuiCommandExecutor.PLAYER.getExecutor();
                 dataContainer.set(COMMAND_KEY, PersistentDataType.STRING, guiItem.getCommand());
                 dataContainer.set(COMMAND_EXECUTOR_KEY, PersistentDataType.STRING, commandExecutor);
             }
@@ -156,7 +158,7 @@ public class SystemGuiManager {
             String type = (String) itemConfig.get("type");
             ItemStackType itemStackType = ItemStackType.fromName(type);
             String executor = (String) itemConfig.get("executor");
-            CommandExecutor commandExecutor = CommandExecutor.fromString(executor);
+            GuiCommandExecutor commandExecutor = GuiCommandExecutor.fromString(executor);
 
             Map<?, ?> position = (Map<?, ?>) itemConfig.get("position");
             int row = (int) position.get("row");
@@ -170,7 +172,7 @@ public class SystemGuiManager {
                     .row(row)
                     .column(column)
                     .itemStackType(itemStackType != null ? itemStackType : ItemStackType.BUTTON)
-                    .commandExecutor(commandExecutor != null ? commandExecutor : CommandExecutor.PLAYER);
+                    .commandExecutor(commandExecutor != null ? commandExecutor : GuiCommandExecutor.PLAYER);
             items.add(guiItem);
         }
         return items;

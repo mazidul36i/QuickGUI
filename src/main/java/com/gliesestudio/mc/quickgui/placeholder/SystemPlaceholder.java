@@ -9,4 +9,6 @@ public class SystemPlaceholder {
     public static final String GUI_OPEN_PERMISSION = "%gui-open-permission%";
     public static final String GUI_ALIAS = "%gui_alias%";
 
+    public static final String PLAYER = "%player%";
+
 }

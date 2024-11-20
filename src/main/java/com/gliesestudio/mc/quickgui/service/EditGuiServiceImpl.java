@@ -2,14 +2,19 @@ package com.gliesestudio.mc.quickgui.service;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
-import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
+import com.gliesestudio.mc.quickgui.gui.GUI;
+import com.gliesestudio.mc.quickgui.gui.GuiHolder;
+import com.gliesestudio.mc.quickgui.gui.GuiManager;
+import com.gliesestudio.mc.quickgui.gui.OpenMode;
+import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
+import com.gliesestudio.mc.quickgui.gui.item.GuiItemInfo;
 import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
-import com.gliesestudio.mc.quickgui.manager.GuiManager;
 import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
@@ -22,20 +27,18 @@ import java.util.logging.Logger;
 
 public class EditGuiServiceImpl implements EditGuiService {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(GuiManager.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(EditGuiServiceImpl.class);
 
     private final Logger logger;
     private final QuickGUI plugin;
 
-    private final GuiManager guiManager;
     private final SystemGuiManager systemGuiManager;
 
     private final File guiFolder;
 
-    public EditGuiServiceImpl(QuickGUI plugin, GuiManager guiManager, SystemGuiManager systemGuiManager) {
+    public EditGuiServiceImpl(QuickGUI plugin, SystemGuiManager systemGuiManager) {
         this.logger = plugin.getLogger();
         this.plugin = plugin;
-        this.guiManager = guiManager;
         this.systemGuiManager = systemGuiManager;
 
         this.guiFolder = new File(plugin.getDataFolder(), "guis");
@@ -44,7 +47,7 @@ public class EditGuiServiceImpl implements EditGuiService {
     @Override
     public void createGui(@NotNull CommandSender sender, String name, int rows) {
         // Create the GUI file
-        File guiFile = new File(plugin.getDataFolder() + "/guis", name + ".yml");
+        File guiFile = new File(guiFolder, name + ".yml");
         // Verify if any GUI with the same name already exists.
         if (guiFile.exists()) {
             sender.sendMessage("§cA GUI with the name '§r" + name + "§c' already exists.");
@@ -68,8 +71,7 @@ public class EditGuiServiceImpl implements EditGuiService {
                 plugin.getLogger().log(Level.INFO, "Created new GUI: " + name + " with " + rows + " rows.");
 
                 // Reload GUIs to include the new GUI in the manager
-                guiManager.reloadGuis();
-                return;
+                GuiManager.reloadGuis(plugin);
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Could not create GUI file for " + name, e);
@@ -79,22 +81,23 @@ public class EditGuiServiceImpl implements EditGuiService {
 
     @Override
     public void reloadGui(String name) {
-        guiManager.reloadGui(name);
+        GuiManager.reloadGui(plugin, name);
     }
 
     @Override
     public void reloadGuis() {
-        guiManager.reloadGuis();
+        GuiManager.reloadGuis(plugin);
     }
 
     @Override
     public boolean editGui(@NotNull Player player, String name) {
-        QuickGuiHolder editGuiHolder = guiManager.getGui(name);
-        if (editGuiHolder == null) {
+        GUI gui = GuiManager.getGui(name);
+        if (gui == null) {
             player.sendMessage("§cNo GUI with the name '§r" + name + "§c' exists.");
             return true;
         }
 
+        GuiHolder editGuiHolder = new GuiHolder(plugin, player, gui, OpenMode.EDIT);
         // Create the GUI from system resources
         SystemGuiHolder systemGuiHolder = systemGuiManager.createGuiFromSystemResource("edit-gui", editGuiHolder,
                 PluginCommands.Action.EDIT);
@@ -159,4 +162,32 @@ public class EditGuiServiceImpl implements EditGuiService {
             return false;
         }
     }
+
+    @Override
+    public void openGuiEditItem(Player player, SystemGuiHolder systemGuiHolder) {
+        player.openInventory(systemGuiHolder.getEditGuiHolder().createInventory());
+    }
+
+    @Override
+    public void editGuiItem(Player player, GuiHolder holder, ItemStack itemStack, int slot) {
+        GUI gui = holder.getGui();
+        if (itemStack != null && !itemStack.getType().isAir() && !itemStack.getType().isEmpty()) {
+            GuiItem guiItem = new GuiItem();
+            guiItem.setItem(GuiItemInfo.fromItemStack(itemStack));
+            gui.updateItem(slot, guiItem);
+        } else {
+            gui.updateItem(slot, null);
+        }
+
+        try {
+            YamlConfiguration guiConfig = gui.serialize();
+            File guiFile = new File(guiFolder, holder.getGui().getName() + ".yml");
+            guiConfig.save(guiFile);
+            log.info("Updated item slot: {}", slot);
+            reloadGui(holder.getGui().getName());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

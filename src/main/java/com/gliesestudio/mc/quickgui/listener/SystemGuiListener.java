@@ -84,6 +84,13 @@ public class SystemGuiListener implements Listener {
                 return;
             }
 
+            switch (systemCommand) {
+                case EDIT_ITEMS -> {
+                    plugin.getEditGuiService().openGuiEditItem(player, systemGuiHolder);
+                }
+
+                case null, default -> player.sendMessage("§cUnknown system command.");
+            }
         }
     }
 

@@ -2,7 +2,7 @@ package com.gliesestudio.mc.quickgui.executor;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
-import com.gliesestudio.mc.quickgui.manager.GuiManager;
+import com.gliesestudio.mc.quickgui.gui.GuiManager;
 import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
 import com.gliesestudio.mc.quickgui.service.EditGuiServiceImpl;
@@ -15,13 +15,11 @@ import org.jetbrains.annotations.NotNull;
 public class EditGuiActionExecutor implements CommandExecutor {
 
     private final QuickGUI plugin;
-    private final GuiManager guiManager;
     private final EditGuiService editGuiService;
 
-    public EditGuiActionExecutor(QuickGUI plugin, GuiManager guiManager, SystemGuiManager systemGuiManager) {
+    public EditGuiActionExecutor(QuickGUI plugin, SystemGuiManager systemGuiManager) {
         this.plugin = plugin;
-        this.guiManager = guiManager;
-        editGuiService = new EditGuiServiceImpl(plugin, guiManager, systemGuiManager);
+        editGuiService = new EditGuiServiceImpl(plugin, systemGuiManager);
     }
 
     @Override
@@ -69,7 +67,7 @@ public class EditGuiActionExecutor implements CommandExecutor {
     private void reloadPluginConfig(@NotNull CommandSender sender) {
         plugin.reloadConfig();
         sender.sendMessage("§aReloaded plugin configs.");
-        int guiSize = guiManager.reloadGuis();
+        int guiSize = GuiManager.reloadGuis(plugin);
         if (guiSize == 0)
             sender.sendMessage("§6No GUI configured to load! Create your first GUI using /editgui add <name>.");
         else

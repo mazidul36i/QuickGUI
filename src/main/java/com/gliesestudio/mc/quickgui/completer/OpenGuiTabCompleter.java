@@ -25,7 +25,7 @@
 package com.gliesestudio.mc.quickgui.completer;
 
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
-import com.gliesestudio.mc.quickgui.manager.GuiManager;
+import com.gliesestudio.mc.quickgui.gui.GuiManager;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -51,11 +51,6 @@ import java.util.List;
 public class OpenGuiTabCompleter implements TabCompleter {
 
     private static final Logger log = LoggerFactory.getLogger(OpenGuiTabCompleter.class);
-    private final GuiManager guiManager;
-
-    public OpenGuiTabCompleter(GuiManager guiManager) {
-        this.guiManager = guiManager;
-    }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
@@ -66,7 +61,7 @@ public class OpenGuiTabCompleter implements TabCompleter {
 
         List<String> suggestions = new ArrayList<>();
         if (args.length == 1) {
-            for (String guiName : guiManager.getGuiNames()) {
+            for (String guiName : GuiManager.getGuiNames()) {
                 if (guiName.toLowerCase().contains(args[0].toLowerCase())) {
                     suggestions.add(guiName);
                 }

@@ -25,7 +25,7 @@
 package com.gliesestudio.mc.quickgui.completer;
 
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
-import com.gliesestudio.mc.quickgui.manager.GuiManager;
+import com.gliesestudio.mc.quickgui.gui.GuiManager;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -54,12 +54,6 @@ public class EditActionTabCompleter implements TabCompleter {
     private static final Logger log = LoggerFactory.getLogger(EditActionTabCompleter.class);
     private static final Set<PluginCommands.Action> actions = Set.of(PluginCommands.Action.values());
 
-    private final GuiManager guiManager;
-
-    public EditActionTabCompleter(GuiManager guiManager) {
-        this.guiManager = guiManager;
-    }
-
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         // Suggestion list.
@@ -81,7 +75,7 @@ public class EditActionTabCompleter implements TabCompleter {
         if (args.length == 2) {
             PluginCommands.Action action = PluginCommands.Action.fromString(args[0]);
             if (PluginCommands.Action.EDIT.equals(action)) {
-                suggestions.addAll(guiManager.getGuiNames());
+                suggestions.addAll(GuiManager.getGuiNames());
             }
         }
 

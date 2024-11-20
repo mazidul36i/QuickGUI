@@ -1,60 +1,61 @@
-title: "&l&4Welcome to QuickGUI"
+name: welcome
+title: '&l&4Welcome to QuickGUI'
+alias: welcome
 rows: 1
 
 # List of items in the GUI.
 items:
-  - item: "LIME_STAINED_GLASS_PANE"
-    type: "filler"
-    position:
-      row: 1
-      column: 1
-  - item: "LIME_STAINED_GLASS_PANE"
-    type: "filler"
-    position:
-      row: 1
-      column: 2
-  - item: "LIME_STAINED_GLASS_PANE"
-    type: "filler"
-    position:
-      row: 1
-      column: 3
+  0:
+    item:
+      name: LIME_STAINED_GLASS_PANEt
+      type: filler
+  1:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler
+  2:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler
+  3:
+    item:
+      name: DIAMOND
+      type: button
+      display-name: '&bWelcome'
+    actions:
+      left:
+        commands:
+          - 'tellraw %player% [{"text": "Hey, %player%! Welcome to the ", "color": "white"}, {"text": "QuickGUI", "color": "aqua"}, {"text": ".", "color": "white"}]'
+        close-inv: true
 
-  - item: "DIAMOND"
-    display-name: "&bWelcome"
-    command: "say Hello, %player%! Welcome to the QuickGUI"
-    type: "button"
-    position:
-      row: 1
-      column: 4
+  4:
+    item:
+      name: ENCHANTED_BOOK
+      type: button
+      display-name: '&cHelp'
+    actions:
+      left:
+        command: help quickgui
+        close-inv: true
 
-  - item: "KNOWLEDGE_BOOK"
-    display-name: "&aHelp"
-    command: "help quickgui"
-    type: "button"
-    position:
-      row: 1
-      column: 5
+  5:
+    item:
+      name: GRAY_DYE
+      type: button
+      display-name: '&8Close'
+    actions:
+      left:
+        close-inv: true
 
-  - item: "GRAY_DYE"
-    display-name: "&8Close"
-    command: null
-    type: "button"
-    position:
-      row: 1
-      column: 6
-
-  - item: "LIME_STAINED_GLASS_PANE"
-    type: "filler"
-    position:
-      row: 1
-      column: 7
-  - item: "LIME_STAINED_GLASS_PANE"
-    type: "filler"
-    position:
-      row: 1
-      column: 8
-  - item: "LIME_STAINED_GLASS_PANE"
-    type: "filler"
-    position:
-      row: 1
-      column: 9
+  6:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler
+  7:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler
+  8:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler
