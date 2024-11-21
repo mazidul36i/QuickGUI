@@ -5,34 +5,39 @@ import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
 import com.gliesestudio.mc.quickgui.placeholder.SystemPlaceholder;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class SystemGuiHolder extends GuiHolder {
 
+    private static final Logger log = LoggerFactory.getLogger(SystemGuiHolder.class);
+
     private final GUI systemGui;
+    @Getter
     private final SystemGuiHolder prevSystemGui;
 
-    public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui) {
-        super(plugin, player, gui, OpenMode.EDIT);
+    public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode) {
+        super(plugin, player, gui, mode);
         this.systemGui = systemGui;
         this.prevSystemGui = null;
     }
 
-    public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, SystemGuiHolder prevSystemGui) {
-        super(plugin, player, gui, OpenMode.EDIT);
+    public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode, SystemGuiHolder prevSystemGui) {
+        super(plugin, player, gui, mode);
         this.systemGui = systemGui;
         this.prevSystemGui = prevSystemGui;
     }
 
-    @Override
-    public boolean hasPreviousGui() {
+    public boolean hasPrevSystemGui() {
         return this.prevSystemGui != null && this.prevSystemGui.getGui() != null;
     }
 
@@ -43,7 +48,10 @@ public class SystemGuiHolder extends GuiHolder {
     }
 
     public @NotNull Inventory createInventory() {
-        String titleText = "&5GUI: &r" + super.gui.getName();
+        String titleText;
+        if (OpenMode.EDIT_ITEMS.equals(super.getMode())) titleText = systemGui.getTitle();
+        else titleText = "&5GUI: &r" + super.gui.getName();
+
         TextComponent title = Component.text(PluginUtils.translateColorCodes(titleText));
         int invSize = systemGui.getRows() * 9;
         super.inventory = super.plugin.getServer().createInventory(this, invSize, title);
@@ -72,7 +80,7 @@ public class SystemGuiHolder extends GuiHolder {
     }
 
     public @NotNull Inventory getGuiInventory() {
-        GuiHolder guiHolder = new GuiHolder(super.plugin, super.player, super.gui, OpenMode.EDIT);
+        GuiHolder guiHolder = new GuiHolder(super.plugin, super.player, super.gui, OpenMode.EDIT_GUI);
         return guiHolder.getInventory();
     }
 

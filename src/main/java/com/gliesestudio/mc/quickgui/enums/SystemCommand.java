@@ -8,7 +8,8 @@ public enum SystemCommand {
     CHANGE_ROWS("change rows", AwaitingInputType.INPUT_ROW),
     CHANGE_PERMISSION("change permission", AwaitingInputType.INPUT_PERMISSION),
     CHANGE_ALIAS("change alias", AwaitingInputType.INPUT_ALIAS),
-    EDIT_ITEMS("edit items", null);
+    EDIT_ITEMS("edit items", null),
+    BACK("back", null);
 
     private final String command;
     private final AwaitingInputType inputType;

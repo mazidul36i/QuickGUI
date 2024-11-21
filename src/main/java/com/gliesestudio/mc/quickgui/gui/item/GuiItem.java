@@ -1,8 +1,10 @@
 package com.gliesestudio.mc.quickgui.gui.item;
 
+import com.gliesestudio.mc.quickgui.enums.PlayerHead;
 import com.gliesestudio.mc.quickgui.placeholder.PlaceholderHelper;
 import com.gliesestudio.mc.quickgui.placeholder.SystemPlaceholder;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
+import com.gliesestudio.mc.quickgui.utility.CustomHeadUtil;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
 import lombok.Data;
 import net.kyori.adventure.text.Component;
@@ -67,6 +69,13 @@ public class GuiItem implements Serializable {
         ItemStack itemStack = new ItemStack(itemMaterial);
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
+            if (Material.PLAYER_HEAD.equals(itemMaterial)) {
+                PlayerHead playerHead = PlayerHead.fromString(item.getTexture());
+                if (playerHead != null) {
+                    CustomHeadUtil.setCustomHeadMeta(meta, playerHead.getBase64());
+                }
+            }
+
             if (item.isHideTooltip()) {
                 meta.setHideTooltip(true);
             } else {

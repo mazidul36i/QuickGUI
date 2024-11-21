@@ -12,6 +12,8 @@ import com.gliesestudio.mc.quickgui.listener.SystemGuiListener;
 import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
 import com.gliesestudio.mc.quickgui.service.EditGuiServiceImpl;
+import com.gliesestudio.mc.quickgui.service.EditItemService;
+import com.gliesestudio.mc.quickgui.service.EditItemServiceImpl;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,6 +34,7 @@ public final class QuickGUI extends JavaPlugin {
 
     // Services
     private EditGuiService editGuiService;
+    private EditItemService editItemService;
 
     @Override
     public void onEnable() {
@@ -44,6 +47,7 @@ public final class QuickGUI extends JavaPlugin {
 
         // Initialize services
         editGuiService = new EditGuiServiceImpl(this);
+        editItemService = new EditItemServiceImpl(this);
 
         // Initialize commands
         openGuiCommandExecutor = new OpenGuiCommand(this);
@@ -100,6 +104,11 @@ public final class QuickGUI extends JavaPlugin {
     public @NotNull EditGuiService getEditGuiService() {
         if (editGuiService == null) editGuiService = new EditGuiServiceImpl(this);
         return editGuiService;
+    }
+
+    public @NotNull EditItemService getEditItemService() {
+        if (editGuiService == null) editItemService = new EditItemServiceImpl(this);
+        return editItemService;
     }
 
 }

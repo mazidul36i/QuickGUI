@@ -53,7 +53,7 @@ public class GuiHolder implements InventoryHolder {
     }
 
     public @NotNull Inventory createInventory() {
-        String titleText = mode == OpenMode.EDIT ? "&5GUI: &r" + gui.getName() : PluginUtils.replacePlaceholders(gui.getTitle(), player);
+        String titleText = mode == OpenMode.EDIT_GUI ? "&5GUI: &r" + gui.getName() : PluginUtils.replacePlaceholders(gui.getTitle(), player);
         TextComponent title = Component.text(PluginUtils.translateColorCodes(titleText));
         int invSize = gui.getRows() * 9;
         this.inventory = plugin.getServer().createInventory(this, invSize, title);

@@ -7,7 +7,7 @@ import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.gui.command.GuiCommandExecutor;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemAction;
-import com.gliesestudio.mc.quickgui.gui.item.GuiItemActionType;
+import com.gliesestudio.mc.quickgui.service.EditItemService;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -28,8 +28,11 @@ public class GuiListener implements Listener {
     private static final Logger log = LoggerFactory.getLogger(GuiListener.class);
     private final QuickGUI plugin;
 
+    private final EditItemService editItemService;
+
     public GuiListener(QuickGUI plugin) {
         this.plugin = plugin;
+        this.editItemService = plugin.getEditItemService();
     }
 
     @EventHandler
@@ -49,7 +52,7 @@ public class GuiListener implements Listener {
         ItemStack cursorItem = event.getCursor().clone();
         ClickType clickType = event.getClick();
 
-        if (OpenMode.EDIT.equals(holder.getMode())) {
+        if (OpenMode.EDIT_GUI.equals(holder.getMode())) {
             if (clickType.isRightClick()) event.setCancelled(true);
             if (InventoryAction.UNKNOWN.equals(inventoryAction)) return;
             handleEditGuiClick(player, holder, cursorItem, slot, clickType, inventoryAction);
@@ -104,8 +107,7 @@ public class GuiListener implements Listener {
         if (clickType.isLeftClick()) {
             onEditGuiItemChange(player, holder, itemStack, slot);
         } else if (clickType.isRightClick()) {
-            // TODO: open item edit gui
-            player.sendMessage("Will open edit item gui");
+            editItemService.openEditItemGui(player, holder, slot);
         }
     }
 

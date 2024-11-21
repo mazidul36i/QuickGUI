@@ -10,44 +10,54 @@ items:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   1:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   2:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   3:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   4:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   5:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   6:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   7:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   8:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
 
   # Row 2
   9:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
 
   10:
     item:
@@ -134,16 +144,19 @@ items:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   17:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
 
   # Row 3
   18:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
 
   19:
     item:
@@ -161,22 +174,27 @@ items:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   22:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   23:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   24:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
   25:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
+      hide-tooltip: true
 
   26:
     item:

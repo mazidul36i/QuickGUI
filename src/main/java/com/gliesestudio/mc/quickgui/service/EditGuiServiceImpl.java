@@ -99,7 +99,7 @@ public class EditGuiServiceImpl implements EditGuiService {
         }
 
         // Open the GUI
-        SystemGuiHolder guiHolder = new SystemGuiHolder(plugin, player, editGui, gui);
+        SystemGuiHolder guiHolder = new SystemGuiHolder(plugin, player, editGui, gui, OpenMode.EDIT_GUI);
         player.openInventory(guiHolder.getInventory());
         return true;
     }

@@ -22,6 +22,7 @@ public class GuiItemInfo implements Serializable {
     private String displayName;
     private List<String> lore;
     private boolean hideTooltip;
+    private String texture;
 
     public static GuiItemInfo deserialize(ConfigurationSection itemInfoConfig) {
         GuiItemInfo info = new GuiItemInfo();
@@ -31,6 +32,7 @@ public class GuiItemInfo implements Serializable {
         info.setDisplayName(itemInfoConfig.getString("display-name"));
         info.setLore(itemInfoConfig.getStringList("lore"));
         info.setHideTooltip(itemInfoConfig.getBoolean("hide-tooltip", false));
+        info.setTexture(itemInfoConfig.getString("texture"));
         return info;
     }
 
@@ -48,6 +50,7 @@ public class GuiItemInfo implements Serializable {
         itemInfoConfig.put("display-name", displayName);
         itemInfoConfig.put("hide-tooltip", hideTooltip);
         if (lore != null && !lore.isEmpty()) itemInfoConfig.put("lore", lore);
+        itemInfoConfig.put("texture", texture);
         return itemInfoConfig;
     }
 

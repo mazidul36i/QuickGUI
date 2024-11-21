@@ -2,6 +2,8 @@ package com.gliesestudio.mc.quickgui.listener;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.enums.SystemCommand;
+import com.gliesestudio.mc.quickgui.gui.GUI;
+import com.gliesestudio.mc.quickgui.gui.GuiHolder;
 import com.gliesestudio.mc.quickgui.gui.OpenMode;
 import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
@@ -14,7 +16,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,16 +44,11 @@ public class SystemGuiListener implements Listener {
         }
 
         int slot = event.getSlot();
-        ItemStack cursorItem = event.getCursor().clone();
         ClickType clickType = event.getClick();
-
         event.setCancelled(true); // Prevent players from taking items
-        /*if (OpenMode.EDIT.equals(holder.getMode())) {
-            handleEditGuiClick(player, holder, cursorItem, slot, clickType, inventoryAction);
-            return;
-        }*/
 
         GuiItem guiItem = holder.getSystemGuiItem(slot);
+        if (guiItem == null) return;
         handleGuiClick(holder, player, guiItem, clickType);
     }
 
@@ -62,7 +58,6 @@ public class SystemGuiListener implements Listener {
             return;
         }
 
-        // Get the action based on the click type
         // Get the action based on the click type
         GuiItemAction action = switch (clickType) {
             case LEFT -> guiItem.getActions().get(GuiItemActionType.LEFT);
@@ -92,6 +87,17 @@ public class SystemGuiListener implements Listener {
         switch (systemCommand) {
             case EDIT_ITEMS -> {
                 plugin.getEditGuiService().openGuiEditItem(player, systemGuiHolder);
+            }
+
+            case BACK -> {
+                player.closeInventory();
+                if (systemGuiHolder.hasPrevSystemGui()) {
+                    player.openInventory(systemGuiHolder.getPrevSystemGui().getInventory());
+                } else if (systemGuiHolder.getGui() != null) {
+                    GUI gui = systemGuiHolder.getGui();
+                    GuiHolder guiHolder = new GuiHolder(plugin, player, gui, OpenMode.EDIT_GUI);
+                    player.openInventory(guiHolder.getInventory());
+                }
             }
 
             case null, default -> player.sendMessage("§cUnknown system command.");
