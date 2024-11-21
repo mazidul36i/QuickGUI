@@ -1,7 +1,7 @@
 package com.gliesestudio.mc.quickgui.model;
 
 import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
-import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
+import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 
 import java.io.Serial;
 import java.io.Serializable;

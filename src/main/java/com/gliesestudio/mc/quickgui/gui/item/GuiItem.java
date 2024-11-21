@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -36,7 +37,28 @@ public class GuiItem implements Serializable {
     }
 
     @Nullable
+    public GuiItemAction getAction(ClickType clickType) {
+        if (!hasActions()) {
+            return null;
+        }
+
+        return switch (clickType) {
+            case LEFT -> actions.get(GuiItemActionType.LEFT);
+            case SHIFT_LEFT -> actions.get(GuiItemActionType.SHIFT_LEFT);
+            case MIDDLE -> actions.get(GuiItemActionType.MIDDLE);
+            case RIGHT -> actions.get(GuiItemActionType.RIGHT);
+            case SHIFT_RIGHT -> actions.get(GuiItemActionType.SHIFT_RIGHT);
+            case null, default -> null;
+        };
+    }
+
+    @Nullable
     public ItemStack createItemStack(Player player) {
+        return createItemStack(player, null);
+    }
+
+    @Nullable
+    public ItemStack createItemStack(Player player, Map<String, String> placeholders) {
         if (item == null || item.getName() == null) return null;
 
         Material itemMaterial = Material.getMaterial(item.getName());
@@ -50,16 +72,23 @@ public class GuiItem implements Serializable {
             } else {
                 // Set display name
                 if (item.getDisplayName() != null) {
-                    meta.displayName(Component.text(PluginUtils.translateColorCodes(item.getDisplayName())));
+                    String displayName = item.getDisplayName();
+                    if (CollectionUtils.isNotEmpty(placeholders)) {
+                        displayName = PlaceholderHelper.parseValues(item.getDisplayName(), placeholders);
+                    }
+                    meta.displayName(Component.text(PluginUtils.translateColorCodes(displayName)));
                 }
 
                 // Set lore with parsed placeholders
                 if (CollectionUtils.isNotEmpty(item.getLore())) {
-                    meta.lore(item.getLore().stream().map(text ->
-                            text != null && !text.isEmpty() ? Component.text(PluginUtils.translateColorCodes(
-                                    PlaceholderHelper.parseValue(text, SystemPlaceholder.PLAYER, player.getName())
-                            )) : Component.empty()
-                    ).toList());
+                    meta.lore(item.getLore().stream().map(text -> {
+                        if (text != null && !text.isEmpty() && CollectionUtils.isNotEmpty(placeholders)) {
+                            text = PlaceholderHelper.parseValues(text, placeholders);
+                            text = PlaceholderHelper.parseValue(text, SystemPlaceholder.PLAYER, player.getName());
+                        }
+                        return text != null && !text.isEmpty() ? Component.text(PluginUtils.translateColorCodes(text))
+                                : Component.empty();
+                    }).toList());
                 }
             }
             itemStack.setItemMeta(meta);

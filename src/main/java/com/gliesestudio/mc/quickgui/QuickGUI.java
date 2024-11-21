@@ -24,8 +24,6 @@ public final class QuickGUI extends JavaPlugin {
 
     private final Logger logger = getLogger();
 
-    private SystemGuiManager systemGuiManager;
-
     // Listeners
     private ChatListener chatListener;
 
@@ -42,10 +40,10 @@ public final class QuickGUI extends JavaPlugin {
 
         // Initialize gui managers
         GuiManager.init(this);
-        systemGuiManager = new SystemGuiManager(this);
+        SystemGuiManager.init(this);
 
         // Initialize services
-        editGuiService = new EditGuiServiceImpl(this, systemGuiManager);
+        editGuiService = new EditGuiServiceImpl(this);
 
         // Initialize commands
         openGuiCommandExecutor = new OpenGuiCommand(this);
@@ -74,7 +72,7 @@ public final class QuickGUI extends JavaPlugin {
 
         // Register gui click listener
         pluginManager.registerEvents(new GuiListener(this), this);
-        pluginManager.registerEvents(new SystemGuiListener(this, systemGuiManager, chatListener), this);
+        pluginManager.registerEvents(new SystemGuiListener(this, chatListener), this);
 
         // Register the chat listener
         pluginManager.registerEvents(chatListener, this);
@@ -93,14 +91,14 @@ public final class QuickGUI extends JavaPlugin {
         // Register the EditGuiCommand
         PluginCommand editGuiCommand = getCommand(PluginCommands.GUI);
         if (Objects.nonNull(editGuiCommand)) {
-            editGuiCommand.setExecutor(new EditGuiActionExecutor(this, systemGuiManager));
+            editGuiCommand.setExecutor(new EditGuiActionExecutor(this, editGuiService));
             editGuiCommand.setTabCompleter(new EditActionTabCompleter());
         }
 
     }
 
     public @NotNull EditGuiService getEditGuiService() {
-        if (editGuiService == null) editGuiService = new EditGuiServiceImpl(this, systemGuiManager);
+        if (editGuiService == null) editGuiService = new EditGuiServiceImpl(this);
         return editGuiService;
     }
 

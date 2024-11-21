@@ -2,7 +2,7 @@ package com.gliesestudio.mc.quickgui.listener;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
-import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
+import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.model.AwaitingInputHolder;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -43,7 +43,7 @@ public class ChatListener implements Listener {
             log.info("Message: {}", textInput);
 
             AwaitingInputHolder awaitingInputHolder = awaitingInputs.get(player.getUniqueId());
-            String name = awaitingInputHolder.getSystemGuiHolder().getEditGuiHolder().getGui().getName();
+            String name = awaitingInputHolder.getSystemGuiHolder().getGui().getName();
 
             switch (awaitingInputHolder.getInputType()) {
                 case INPUT_NAME -> {

@@ -3,9 +3,7 @@ package com.gliesestudio.mc.quickgui.executor;
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
 import com.gliesestudio.mc.quickgui.gui.GuiManager;
-import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
-import com.gliesestudio.mc.quickgui.service.EditGuiServiceImpl;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,9 +15,9 @@ public class EditGuiActionExecutor implements CommandExecutor {
     private final QuickGUI plugin;
     private final EditGuiService editGuiService;
 
-    public EditGuiActionExecutor(QuickGUI plugin, SystemGuiManager systemGuiManager) {
+    public EditGuiActionExecutor(QuickGUI plugin, EditGuiService editGuiService) {
         this.plugin = plugin;
-        editGuiService = new EditGuiServiceImpl(plugin, systemGuiManager);
+        this.editGuiService = editGuiService;
     }
 
     @Override

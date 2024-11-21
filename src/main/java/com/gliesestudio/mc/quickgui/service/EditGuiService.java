@@ -1,8 +1,7 @@
 package com.gliesestudio.mc.quickgui.service;
 
 import com.gliesestudio.mc.quickgui.gui.GuiHolder;
-import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
-import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
+import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

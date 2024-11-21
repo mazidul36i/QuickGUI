@@ -15,12 +15,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class GuiHolder implements InventoryHolder {
 
-    private final QuickGUI plugin;
+    protected final QuickGUI plugin;
+    protected Inventory inventory;
+    protected final Player player;
 
-    private Inventory inventory;
-    private final Player player;
     @Getter
-    private final GUI gui;
+    protected final GUI gui;
     @Getter
     private final OpenMode mode;
     @Getter
@@ -42,6 +42,10 @@ public class GuiHolder implements InventoryHolder {
         this.previousGui = previousGui;
     }
 
+    public boolean hasPreviousGui() {
+        return previousGui != null && previousGui.getGui() != null;
+    }
+
     @Override
     public @NotNull Inventory getInventory() {
         if (inventory != null) return inventory;
@@ -51,10 +55,12 @@ public class GuiHolder implements InventoryHolder {
     public @NotNull Inventory createInventory() {
         String titleText = mode == OpenMode.EDIT ? "&5GUI: &r" + gui.getName() : PluginUtils.replacePlaceholders(gui.getTitle(), player);
         TextComponent title = Component.text(PluginUtils.translateColorCodes(titleText));
-        this.inventory = plugin.getServer().createInventory(this, gui.getRows() * 9, title);
+        int invSize = gui.getRows() * 9;
+        this.inventory = plugin.getServer().createInventory(this, invSize, title);
 
         if (CollectionUtils.isNotEmpty(gui.getItems())) {
             gui.getItems().forEach((slot, guiItem) -> {
+                if (slot >= invSize) return;
                 ItemStack itemStack = guiItem.createItemStack(player);
                 if (itemStack != null) inventory.setItem(slot, itemStack);
             });

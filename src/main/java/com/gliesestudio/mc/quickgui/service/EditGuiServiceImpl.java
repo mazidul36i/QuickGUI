@@ -1,14 +1,9 @@
 package com.gliesestudio.mc.quickgui.service;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
-import com.gliesestudio.mc.quickgui.commands.PluginCommands;
-import com.gliesestudio.mc.quickgui.gui.GUI;
-import com.gliesestudio.mc.quickgui.gui.GuiHolder;
-import com.gliesestudio.mc.quickgui.gui.GuiManager;
-import com.gliesestudio.mc.quickgui.gui.OpenMode;
+import com.gliesestudio.mc.quickgui.gui.*;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemInfo;
-import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -32,14 +27,11 @@ public class EditGuiServiceImpl implements EditGuiService {
     private final Logger logger;
     private final QuickGUI plugin;
 
-    private final SystemGuiManager systemGuiManager;
-
     private final File guiFolder;
 
-    public EditGuiServiceImpl(QuickGUI plugin, SystemGuiManager systemGuiManager) {
+    public EditGuiServiceImpl(QuickGUI plugin) {
         this.logger = plugin.getLogger();
         this.plugin = plugin;
-        this.systemGuiManager = systemGuiManager;
 
         this.guiFolder = new File(plugin.getDataFolder(), "guis");
     }
@@ -97,19 +89,18 @@ public class EditGuiServiceImpl implements EditGuiService {
             return true;
         }
 
-        GuiHolder editGuiHolder = new GuiHolder(plugin, player, gui, OpenMode.EDIT);
         // Create the GUI from system resources
-        SystemGuiHolder systemGuiHolder = systemGuiManager.createGuiFromSystemResource("edit-gui", editGuiHolder,
-                PluginCommands.Action.EDIT);
+        GUI editGui = SystemGuiManager.getSystemGui("edit-gui");
 
         // Verify if any GUI exists with the name.
-        if (systemGuiHolder == null) {
+        if (editGui == null) {
             player.sendMessage("§cCouldn't load system edit gui for '§r" + name);
             return true;
         }
 
         // Open the GUI
-        player.openInventory(systemGuiHolder.getInventory());
+        SystemGuiHolder guiHolder = new SystemGuiHolder(plugin, player, editGui, gui);
+        player.openInventory(guiHolder.getInventory());
         return true;
     }
 
@@ -165,7 +156,7 @@ public class EditGuiServiceImpl implements EditGuiService {
 
     @Override
     public void openGuiEditItem(Player player, SystemGuiHolder systemGuiHolder) {
-        player.openInventory(systemGuiHolder.getEditGuiHolder().createInventory());
+        player.openInventory(systemGuiHolder.getGuiInventory());
     }
 
     @Override

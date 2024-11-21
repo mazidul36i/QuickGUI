@@ -1,0 +1,79 @@
+package com.gliesestudio.mc.quickgui.gui;
+
+import com.gliesestudio.mc.quickgui.QuickGUI;
+import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
+import com.gliesestudio.mc.quickgui.placeholder.SystemPlaceholder;
+import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
+import com.gliesestudio.mc.quickgui.utility.PluginUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
+
+public class SystemGuiHolder extends GuiHolder {
+
+    private final GUI systemGui;
+    private final SystemGuiHolder prevSystemGui;
+
+    public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui) {
+        super(plugin, player, gui, OpenMode.EDIT);
+        this.systemGui = systemGui;
+        this.prevSystemGui = null;
+    }
+
+    public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, SystemGuiHolder prevSystemGui) {
+        super(plugin, player, gui, OpenMode.EDIT);
+        this.systemGui = systemGui;
+        this.prevSystemGui = prevSystemGui;
+    }
+
+    @Override
+    public boolean hasPreviousGui() {
+        return this.prevSystemGui != null && this.prevSystemGui.getGui() != null;
+    }
+
+    @Override
+    public @NotNull Inventory getInventory() {
+        if (super.inventory != null) return super.inventory;
+        return this.createInventory();
+    }
+
+    public @NotNull Inventory createInventory() {
+        String titleText = "&5GUI: &r" + super.gui.getName();
+        TextComponent title = Component.text(PluginUtils.translateColorCodes(titleText));
+        int invSize = systemGui.getRows() * 9;
+        super.inventory = super.plugin.getServer().createInventory(this, invSize, title);
+
+        // Placeholders
+        Map<String, String> placeholders = Map.of(
+                SystemPlaceholder.GUI_NAME, gui.getName(),
+                SystemPlaceholder.GUI_TITLE, gui.getTitle(),
+                SystemPlaceholder.GUI_ROWS, String.valueOf(gui.getRows()),
+                SystemPlaceholder.GUI_OPEN_PERMISSION, gui.hasPermission() ? gui.getPermission() : "NONE",
+                SystemPlaceholder.GUI_ALIAS, gui.hasAlias() ? gui.getAlias() : "NONE"
+        );
+
+        if (CollectionUtils.isNotEmpty(systemGui.getItems())) {
+            systemGui.getItems().forEach((slot, guiItem) -> {
+                if (slot >= invSize) return;
+                ItemStack itemStack = guiItem.createItemStack(super.player, placeholders);
+                if (itemStack != null) super.inventory.setItem(slot, itemStack);
+            });
+        }
+        return super.inventory;
+    }
+
+    public GuiItem getSystemGuiItem(int slot) {
+        return systemGui.getItems().get(slot);
+    }
+
+    public @NotNull Inventory getGuiInventory() {
+        GuiHolder guiHolder = new GuiHolder(super.plugin, super.player, super.gui, OpenMode.EDIT);
+        return guiHolder.getInventory();
+    }
+
+}

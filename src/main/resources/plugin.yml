@@ -7,7 +7,7 @@ authors: [ Mazidul Islam ]
 description: QuickGUI is the goto plugin to manage all your GUI needs.
 website: https://mazidul.com
 
-softdepend: [ "PlaceholderAPI" ]
+softdepend: [ "PlaceholderAPI", "Vault" ]
 
 permissions:
   quickgui.admin:

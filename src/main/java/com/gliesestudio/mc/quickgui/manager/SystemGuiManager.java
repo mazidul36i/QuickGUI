@@ -2,10 +2,10 @@ package com.gliesestudio.mc.quickgui.manager;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.commands.PluginCommands;
-import com.gliesestudio.mc.quickgui.gui.command.GuiCommandExecutor;
 import com.gliesestudio.mc.quickgui.enums.ItemStackType;
 import com.gliesestudio.mc.quickgui.gui.GUI;
 import com.gliesestudio.mc.quickgui.gui.GuiHolder;
+import com.gliesestudio.mc.quickgui.gui.command.GuiCommandExecutor;
 import com.gliesestudio.mc.quickgui.inventory.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.model.GuiItem;
 import com.gliesestudio.mc.quickgui.placeholder.PlaceholderHelper;
@@ -13,14 +13,11 @@ import com.gliesestudio.mc.quickgui.placeholder.SystemPlaceholder;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,33 +26,34 @@ import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SystemGuiManager {
 
     private static final Logger log = LoggerFactory.getLogger(SystemGuiManager.class);
-    private final NamespacedKey COMMAND_KEY;
-    private final NamespacedKey COMMAND_EXECUTOR_KEY;
+    private static final Map<String, GUI> systemGuis = new HashMap<>();
 
     private final QuickGUI plugin;
 
     public SystemGuiManager(@NotNull QuickGUI plugin) {
-        this.COMMAND_KEY = new NamespacedKey(plugin, "gui_command");
-        this.COMMAND_EXECUTOR_KEY = new NamespacedKey(plugin, "gui_command_executor");
         this.plugin = plugin;
     }
 
-    public @NotNull NamespacedKey COMMAND_KEY() {
-        return this.COMMAND_KEY;
+    public static void init(@NotNull QuickGUI plugin) {
+        loadGuis(plugin);
     }
 
-    public @NotNull NamespacedKey COMMAND_EXECUTOR_KEY() {
-        return this.COMMAND_EXECUTOR_KEY;
+    private static void loadGuis(@NotNull QuickGUI plugin) {
+        GUI editGui = createGuiFromSystemResource(plugin, "edit-gui");
+        if (editGui != null) {
+            systemGuis.put(editGui.getName(), editGui);
+        }
     }
 
     @Nullable
-    public SystemGuiHolder createGuiFromSystemResource(@NotNull String name, @NotNull GuiHolder editGuiHolder, PluginCommands.Action action) {
+    private static GUI createGuiFromSystemResource(@NotNull QuickGUI plugin, @NotNull String name) {
         // Read file from resources
         String filePath = "guis/system/" + name + ".yml";
 
@@ -68,7 +66,12 @@ public class SystemGuiManager {
 
         // Create the GUI from the input stream
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(new InputStreamReader(stream));
-        return createGuiFromYml(configuration, editGuiHolder, action);
+        return GUI.deserialize(configuration);
+    }
+
+    @Nullable
+    public static GUI getSystemGui(String name) {
+        return systemGuis.get(name);
     }
 
     public @NotNull SystemGuiHolder createGuiFromYml(@NotNull FileConfiguration guiConfig, @NotNull GuiHolder editGuiHolder,
@@ -124,14 +127,6 @@ public class SystemGuiManager {
                 ).toList());
             } else {
                 meta.setHideTooltip(true);
-            }
-
-            // Set command into the item meta.
-            if (guiItem.getCommand() != null) {
-                PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-                String commandExecutor = guiItem.getCommandExecutor() != null ? guiItem.getCommandExecutor().getExecutor() : GuiCommandExecutor.PLAYER.getExecutor();
-                dataContainer.set(COMMAND_KEY, PersistentDataType.STRING, guiItem.getCommand());
-                dataContainer.set(COMMAND_EXECUTOR_KEY, PersistentDataType.STRING, commandExecutor);
             }
 
             meta.setCustomModelData(guiItem.getItemStackType().getId());
