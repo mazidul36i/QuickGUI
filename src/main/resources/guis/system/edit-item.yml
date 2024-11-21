@@ -1,0 +1,282 @@
+name: edit-item
+title: "&9Edit Item"
+permission: "quickqui.edit"
+rows: 5
+
+# List of items in the GUI.
+items:
+  # Row 1
+  0:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  1:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  2:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  3:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  #  4: Empty placeholder for item which is being edited.
+
+  5:
+    item:
+      name: "WRITABLE_BOOK"
+      type: "system_button"
+      display-name: "&6Edit Item"
+      lore:
+        - "&7<- &bLeft click with an item to switch"
+
+  6:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  7:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  8:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  # Row 2
+  9:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  10:
+    item:
+      name: "POPPY"
+      type: "system_button"
+      display-name: "&9Change Displayname"
+      lore:
+        - "&7Change the name of the item"
+
+  11:
+    item:
+      name: "DANDELION"
+      type: "system_button"
+      display-name: "&9Change Lores"
+      lore:
+        - "&7Change the lores of the item"
+
+  12:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  13:
+    item:
+      name: "ENCHANTED_BOOK"
+      type: "system_button"
+      display-name: "&9Toggle Glow"
+
+  14:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  15:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  16:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  17:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  # Row 3
+  18:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  19:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  20:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  21:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  22:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  23:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  24:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  25:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  26:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  # Row 4
+  27:
+    item:
+      name: "KNOWLEDGE_BOOK"
+      type: "system_button"
+      display-name: "&6&lActions"
+      lore:
+        - "&bActions get called if you click the Item"
+        - "&bYou can set different Requirements"
+
+  28:
+    item:
+      name: "PLAYER_HEAD"
+      type: "system_button"
+      display-name: "&9Left Click Action"
+      lore:
+        - "&7Current: &a%action-left-click%"
+      texture: "ARROW_LEFT"
+
+  29:
+    item:
+      name: "PLAYER_HEAD"
+      type: "system_button"
+      display-name: "&9Shift Left Click Action"
+      lore:
+        - "&7Current: &a%action-shift-left-click%"
+      texture: "ARROW_UP_LEFT"
+
+  30:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  31:
+    item:
+      name: "PLAYER_HEAD"
+      type: "system_button"
+      display-name: "&9Middle Click Action"
+      lore:
+        - "&7Current: &a%action-middle-click%"
+      texture: "ARROW_UP"
+
+  32:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  33:
+    item:
+      name: "PLAYER_HEAD"
+      type: "system_button"
+      display-name: "&9Right Click Action"
+      lore:
+        - "&7Current: &a%action-right-click%"
+      texture: "ARROW_RIGHT"
+
+  34:
+    item:
+      name: "PLAYER_HEAD"
+      type: "system_button"
+      display-name: "&9Shift Right Click Action"
+      lore:
+        - "&7Current: &a%action-shift-right-click%"
+      texture: "ARROW_UP_RIGHT"
+
+  35:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  # Row 5
+  36:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  37:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  38:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  39:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  40:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  41:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  42:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  43:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  44:
+    item:
+      name: "PLAYER_HEAD"
+      type: "system_button"
+      display-name: "&cBack"
+      texture: "BACK"
+    actions:
+      left:
+        commands:
+          - "back"

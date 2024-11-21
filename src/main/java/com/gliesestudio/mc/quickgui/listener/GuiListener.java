@@ -1,22 +1,24 @@
 package com.gliesestudio.mc.quickgui.listener;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
-import com.gliesestudio.mc.quickgui.commands.PluginCommands;
-import com.gliesestudio.mc.quickgui.enums.ItemStackType;
-import com.gliesestudio.mc.quickgui.inventory.QuickGuiHolder;
-import com.gliesestudio.mc.quickgui.manager.GuiManager;
+import com.gliesestudio.mc.quickgui.gui.GuiHolder;
+import com.gliesestudio.mc.quickgui.gui.OpenMode;
+import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
+import com.gliesestudio.mc.quickgui.gui.command.GuiCommandExecutor;
+import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
+import com.gliesestudio.mc.quickgui.gui.item.GuiItemAction;
+import com.gliesestudio.mc.quickgui.service.EditItemService;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,17 +26,22 @@ import org.slf4j.LoggerFactory;
 public class GuiListener implements Listener {
 
     private static final Logger log = LoggerFactory.getLogger(GuiListener.class);
-    private final GuiManager guiManager;
+    private final QuickGUI plugin;
 
-    public GuiListener(GuiManager guiManager, QuickGUI plugin) {
-        this.guiManager = guiManager;
+    private final EditItemService editItemService;
+
+    public GuiListener(QuickGUI plugin) {
+        this.plugin = plugin;
+        this.editItemService = plugin.getEditItemService();
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
+    public void onInventoryClick(@NotNull InventoryClickEvent event) {
         Inventory clickedInventory = event.getClickedInventory();
+        InventoryAction inventoryAction = event.getAction();
         if (clickedInventory == null ||
-                !(clickedInventory.getHolder(false) instanceof QuickGuiHolder holder) ||
+                !(clickedInventory.getHolder(false) instanceof GuiHolder holder) ||
+                clickedInventory.getHolder(false) instanceof SystemGuiHolder ||
                 !(event.getWhoClicked() instanceof Player player)
         ) {
             // It's not our inventory, ignore it.
@@ -42,72 +49,73 @@ public class GuiListener implements Listener {
         }
 
         int slot = event.getSlot();
-        ItemStack currentItem = event.getCurrentItem();
+        ItemStack cursorItem = event.getCursor().clone();
         ClickType clickType = event.getClick();
-        ItemStackType itemStackType = null;
-        String command = null;
 
-        log.info("Click type: {}, slot: {}", clickType, slot);
-        log.info("Current item: {}", currentItem);
-
-        if (currentItem != null && currentItem.hasItemMeta() && currentItem.getItemMeta().hasCustomModelData()) {
-            int itemStackId = currentItem.getItemMeta().getCustomModelData();
-            itemStackType = ItemStackType.fromId(itemStackId);
-            if (itemStackType != null) {
-                if (ItemStackType.SYSTEM_BUTTON.equals(itemStackType) || ItemStackType.SYSTEM_FILLER.equals(itemStackType)) {
-                    // Cancel event to prevent players from taking items.
-                    event.setCancelled(true);
-                }
-            }
-
-            // Fetch the command from the item meta.
-            PersistentDataContainer dataContainer = currentItem.getItemMeta().getPersistentDataContainer();
-            command = dataContainer.get(guiManager.COMMAND_KEY(), PersistentDataType.STRING);
-        }
-
-        if (PluginCommands.Action.EDIT.equals(holder.getAction()))
-            handleAdminGuiClick(event, player, clickedInventory, command, itemStackType);
-        else {
-            event.setCancelled(true); // Prevent players from taking items
-            handleUserGuiClick(player, command);
-        }
-    }
-
-    private void handleUserGuiClick(Player player, String command) {
-        if (command == null) return;
-        log.info("Command: {}", command);
-
-        if (PluginCommands.SystemCommand.CANCEL.getCommand().equals(command)
-                || PluginCommands.SystemCommand.CLOSE.getCommand().equals(command)) {
-            player.closeInventory();
+        if (OpenMode.EDIT_GUI.equals(holder.getMode())) {
+            if (clickType.isRightClick()) event.setCancelled(true);
+            if (InventoryAction.UNKNOWN.equals(inventoryAction)) return;
+            handleEditGuiClick(player, holder, cursorItem, slot, clickType, inventoryAction);
             return;
         }
 
-        command = PluginUtils.replacePlaceholders(command, player);
-        Bukkit.dispatchCommand(player, command);
+        event.setCancelled(true); // Prevent players from taking items
+        GuiItem guiItem = holder.getGuiItem(slot);
+        handleUserGuiClick(player, guiItem, clickType);
     }
 
-    private void handleAdminGuiClick(InventoryClickEvent event, Player player, Inventory clickedInventory, String command, ItemStackType itemStackType) {
-        log.info("Item stack type: {}, command: {}", itemStackType, command);
-        if (ItemStackType.SYSTEM_BUTTON.equals(itemStackType)) {
-            PluginCommands.SystemCommand systemCommand = PluginCommands.SystemCommand.fromString(command);
-            if (PluginCommands.SystemCommand.CANCEL.equals(systemCommand)) {
-                player.closeInventory();
-                return;
-            }
+    private void handleUserGuiClick(Player player, GuiItem guiItem, ClickType clickType) {
+        // Get the action based on the click type
+        GuiItemAction action = guiItem.getAction(clickType);
+        executeAction(player, action);
+    }
 
-            if (PluginCommands.SystemCommand.CLOSE.equals(systemCommand)) {
-                player.closeInventory();
-                return;
-            }
-
-            if (PluginCommands.SystemCommand.DONE.equals(systemCommand)) {
-                @Nullable ItemStack[] contents = clickedInventory.getContents();
-                log.info("Inventory contents: {}", contents);
-//                        player.closeInventory();
-                return;
+    /**
+     * Execute the action commands for the player.
+     *
+     * @param player the player who triggered the action
+     * @param action the action to execute
+     */
+    private static void executeAction(Player player, GuiItemAction action) {
+        if (action == null) return;
+        if (action.hasCommands()) {
+            if (!action.hasPermission() || (action.hasPermission() && player.hasPermission(action.getPermission()))) {
+                action.getCommands().forEach(command -> {
+                    String parsedCommand = PluginUtils.replacePlaceholders(command, player);
+                    if (GuiCommandExecutor.SERVER.equals(action.getExecutor())) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand);
+                    } else {
+                        Bukkit.dispatchCommand(player, parsedCommand);
+                    }
+                });
+            } else {
+                player.sendMessage("§cYou do not have permission to perform this action");
             }
         }
+
+        // Close the inventory if the action requires it.
+        if (action.isCloseInv()) {
+            player.closeInventory();
+        }
+    }
+
+    // TODO: also add on drag - items added
+    private void handleEditGuiClick(Player player, GuiHolder holder, ItemStack itemStack, int slot, ClickType clickType,
+                                    InventoryAction inventoryAction) {
+        log.info("Item stack: {}", itemStack);
+        if (InventoryAction.NOTHING.equals(inventoryAction)) return;
+        if (clickType.isLeftClick()) {
+            onEditGuiItemChange(player, holder, itemStack, slot);
+        } else if (clickType.isRightClick()) {
+            editItemService.openEditItemGui(player, holder, slot);
+        }
+    }
+
+    private void onEditGuiItemChange(Player player, GuiHolder holder, ItemStack itemStack, int slot) {
+        // Update config in async task
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getEditGuiService().editGuiItem(player, holder, itemStack, slot);
+        });
     }
 
 }

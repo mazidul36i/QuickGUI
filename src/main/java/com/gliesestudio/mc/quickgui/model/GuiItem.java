@@ -1,82 +1,122 @@
 package com.gliesestudio.mc.quickgui.model;
 
-import com.gliesestudio.mc.quickgui.enums.CommandExecutor;
+import com.gliesestudio.mc.quickgui.gui.command.GuiCommandExecutor;
 import com.gliesestudio.mc.quickgui.enums.ItemStackType;
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GuiItem {
 
     private Material item;
     private String displayName;
+    private List<String> lore;
     private String command;
     private int row;
     private int column;
     private ItemStackType itemStackType;
-    private CommandExecutor executor;
+    private GuiCommandExecutor commandExecutor;
 
-    public GuiItem(Material item, String displayName, String command, int row, int column, ItemStackType itemStackType) {
+    public GuiItem() {
+    }
+
+    public GuiItem(Material item, String displayName, List<String> lore, String command, int row, int column,
+                   ItemStackType itemStackType, GuiCommandExecutor commandExecutor) {
         this.item = item;
         this.displayName = displayName;
+        this.lore = lore;
         this.command = command;
         this.row = row;
         this.column = column;
         this.itemStackType = itemStackType;
+        this.commandExecutor = commandExecutor;
     }
 
+    public static GuiItem createSystemFiller(Material item, int row, int column) {
+        return new GuiItem()
+                .item(item)
+                .row(row)
+                .column(column)
+                .itemStackType(ItemStackType.SYSTEM_FILLER)
+                .commandExecutor(GuiCommandExecutor.SERVER);
+    }
+
+    // GuiItem builders
+    public GuiItem item(Material item) {
+        this.item = item;
+        return this;
+    }
+
+    public GuiItem displayName(String displayName) {
+        this.displayName = displayName;
+        return this;
+    }
+
+    public GuiItem lore(List<String> lore) {
+        this.lore = lore;
+        return this;
+    }
+
+    public GuiItem command(String command) {
+        this.command = command;
+        return this;
+    }
+
+    public GuiItem row(int row) {
+        this.row = row;
+        return this;
+    }
+
+    public GuiItem commandExecutor(GuiCommandExecutor executor) {
+        this.commandExecutor = executor;
+        return this;
+    }
+
+    public GuiItem column(int column) {
+        this.column = column;
+        return this;
+    }
+
+    public GuiItem itemStackType(ItemStackType itemStackType) {
+        this.itemStackType = itemStackType;
+        return this;
+    }
+
+    // Getters
     public Material getItem() {
         return item;
-    }
-
-    public void setItem(Material item) {
-        this.item = item;
     }
 
     public String getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public @NotNull List<String> getLore() {
+        return lore != null ? lore : new ArrayList<>();
     }
 
     public String getCommand() {
         return command;
     }
 
-    public void setCommand(String command) {
-        this.command = command;
-    }
-
     public int getRow() {
         return row;
-    }
-
-    public void setRow(int row) {
-        this.row = row;
     }
 
     public int getColumn() {
         return column;
     }
 
-    public void setColumn(int column) {
-        this.column = column;
-    }
 
     public ItemStackType getItemStackType() {
         return itemStackType;
     }
 
-    public void setItemStackType(ItemStackType itemStackType) {
-        this.itemStackType = itemStackType;
-    }
 
-    public CommandExecutor getExecutor() {
-        return executor;
-    }
-
-    public void setExecutor(CommandExecutor executor) {
-        this.executor = executor;
+    public GuiCommandExecutor getCommandExecutor() {
+        return commandExecutor;
     }
 
     @Override

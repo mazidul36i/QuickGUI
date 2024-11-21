@@ -1,0 +1,213 @@
+name: edit-gui
+title: "&5GUI: &r%gui-name%"
+permission: "quickqui.edit"
+rows: 3
+
+# List of items in the GUI.
+items:
+  # Row 1
+  0:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  1:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  2:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  3:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  4:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  5:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  6:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  7:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  8:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  # Row 2
+  9:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  10:
+    item:
+      name: "COMMAND_BLOCK"
+      type: "system_button"
+      display-name: "&bChange Name"
+      lore:
+        - "&7Change the name of this GUI"
+        - "&7/opengui &f<Name>"
+        - ""
+        - "&cNot the Title of the GUI"
+        - "&7Current: &a%gui-name%"
+    actions:
+      left:
+        commands:
+          - "change name"
+
+  11:
+    item:
+      name: "IRON_HELMET"
+      type: "system_button"
+      display-name: "&bChange Title"
+      lore:
+        - "&7Change the Title of this GUI"
+        - ""
+        - "&7Current: &8%gui-title%"
+    actions:
+      left:
+        commands:
+          - "change title"
+
+  12:
+    item:
+      name: "OAK_SAPLING"
+      type: "system_button"
+      display-name: "&bChange Size"
+      lore:
+        - "&7Resize the Inventory Rows (Max 6)"
+        - "&8>> 1 row = 9 inventory size"
+        - ""
+        - "&cItems out of size will be deleted"
+        - "&7Current: &a%gui-rows%"
+    actions:
+      left:
+        commands:
+          - "change rows"
+
+  13:
+    item:
+      name: "GOLDEN_HORSE_ARMOR"
+      type: "system_button"
+      display-name: "&bChange Permission"
+      lore:
+        - "&7Change the open permission "
+        - ""
+        - "&7Current: &a%gui-open-permission%"
+    actions:
+      left:
+        commands:
+          - "change permission"
+
+  14:
+    item:
+      name: "POPPY"
+      type: "system_button"
+      display-name: "&bChange Command Alias"
+      lore:
+        - "&7Change the command alias"
+        - "&fExample: &7/opengui warps &8-> &7/warps"
+        - ""
+        - "&7Current: &a%gui_alias%"
+    actions:
+      left:
+        commands:
+          - "change alias"
+
+  15:
+    item:
+      name: "PLAYER_HEAD"
+      type: "system_button"
+      display-name: "Player Head"
+
+  16:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  17:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  # Row 3
+  18:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  19:
+    item:
+      name: "OAK_SLAB"
+      type: "system_button"
+      display-name: "Oak Slab"
+
+  20:
+    item:
+      name: "OAK_PLANKS"
+      type: "system_button"
+      display-name: "Oak Planks"
+
+  21:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  22:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  23:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  24:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+  25:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
+
+  26:
+    item:
+      name: "CRAFTING_TABLE"
+      type: "system_button"
+      display-name: "&6&lEdit Items"
+      lore:
+        - "&bLeft Click:"
+        - "&3Move Items"
+        - ""
+        - "&bRight Click:"
+        - "&3Edit Selected Items"
+    actions:
+      left:
+        commands:
+          - "edit items"

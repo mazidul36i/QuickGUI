@@ -1,12 +1,14 @@
 package com.gliesestudio.mc.quickgui.commands;
 
+import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
+
 import javax.annotation.Nullable;
 
 public interface PluginCommands {
 
-    String OPEN_GUI = "gui";
+    String OPEN_GUI = "opengui";
     String QUICK_GUI = "quickgui";
-    String EDIT_GUI = "editgui";
+    String GUI = "gui";
 
     enum Action {
         RELOAD("reload"),
@@ -38,38 +40,6 @@ public interface PluginCommands {
             return null;
         }
 
-    }
-
-    enum SystemCommand {
-        CANCEL("cancel"),
-        CLOSE("close"),
-        DONE("done");
-
-        private final String command;
-
-        SystemCommand(String command) {
-            this.command = command;
-        }
-
-        /**
-         * This method is used to get the system command from the string.
-         *
-         * @param command The command to get.
-         * @return The system command.
-         */
-        @Nullable
-        public static SystemCommand fromString(String command) {
-            for (SystemCommand c : SystemCommand.values()) {
-                if (c.command.equalsIgnoreCase(command)) {
-                    return c;
-                }
-            }
-            return null;
-        }
-
-        public String getCommand() {
-            return command;
-        }
     }
 
 }

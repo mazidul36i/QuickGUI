@@ -1,0 +1,61 @@
+name: welcome
+title: '&l&4Welcome to QuickGUI'
+alias: welcome
+rows: 1
+
+# List of items in the GUI.
+items:
+  0:
+    item:
+      name: LIME_STAINED_GLASS_PANEt
+      type: filler
+  1:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler
+  2:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler
+  3:
+    item:
+      name: DIAMOND
+      type: button
+      display-name: '&bWelcome'
+    actions:
+      left:
+        commands:
+          - 'tellraw %player% [{"text": "Hey, %player%! Welcome to the ", "color": "white"}, {"text": "QuickGUI", "color": "aqua"}, {"text": ".", "color": "white"}]'
+        close-inv: true
+
+  4:
+    item:
+      name: ENCHANTED_BOOK
+      type: button
+      display-name: '&cHelp'
+    actions:
+      left:
+        command: help quickgui
+        close-inv: true
+
+  5:
+    item:
+      name: GRAY_DYE
+      type: button
+      display-name: '&8Close'
+    actions:
+      left:
+        close-inv: true
+
+  6:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler
+  7:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler
+  8:
+    item:
+      name: LIME_STAINED_GLASS_PANE
+      type: filler

@@ -6,51 +6,46 @@ import com.gliesestudio.mc.quickgui.gui.GuiHolder;
 import com.gliesestudio.mc.quickgui.gui.GuiManager;
 import com.gliesestudio.mc.quickgui.gui.OpenMode;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class OpenGuiCommand implements CommandExecutor {
+import java.util.List;
+
+public class GuiAliasCommand extends Command {
 
     private final QuickGUI plugin;
+    private final String guiName;
 
-    public OpenGuiCommand(QuickGUI plugin) {
+    public GuiAliasCommand(QuickGUI plugin, String name, String guiName, String permission) {
+        super(name);
         this.plugin = plugin;
+        this.guiName = guiName;
+        this.setAliases(List.of(name));
+        this.setPermission(permission);
+        this.setDescription("Opens a GUI with the specified name.");
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        // Check if the sender is a player
+    public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("Only players can use this command.");
+            sender.sendMessage("Only players can open this command.");
+            return true;
+        }
+        if (this.getPermission() != null && !(player.hasPermission(this.getPermission()))) {
+            player.sendMessage("§cYou do not have permission to open this GUI.");
             return true;
         }
 
-        // Check if the player provided a GUI name
-        if (args.length == 0) {
-            player.sendMessage("Please specify the name of the GUI to open.");
-            return false;
-        }
-
-        // Get the GUI name from the command arguments
-        String guiName = args[0];
-
         // Retrieve the GUI from the GuiManager
-        GUI gui = GuiManager.getGui(guiName);
+        GUI gui = GuiManager.guis.get(guiName);
         if (gui == null) {
             player.sendMessage("GUI with the name '" + guiName + "' does not exist.");
             return true;
         }
-
         // Open the GUI for the player
-        if (gui.hasPermission() && !player.hasPermission(gui.getPermission())) {
-            player.sendMessage("§cYou do not have permission to open this GUI.");
-            return true;
-        }
         GuiHolder guiHolder = new GuiHolder(plugin, player, gui, OpenMode.VIEW);
         player.openInventory(guiHolder.getInventory());
         return true;
     }
-
 }
