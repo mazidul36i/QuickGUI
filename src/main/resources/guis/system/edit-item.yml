@@ -1,0 +1,4 @@
+name: edit-item
+title: "&5Edit Item"
+permission: "quickqui.edit"
+rows: 3
