@@ -15,7 +15,11 @@ public enum SystemCommand {
     BACK("back", null),
 
     CHANGE_ITEM_NAME("change item name", AwaitingInputType.INPUT_ITEM_NAME),
+
     CHANGE_ITEM_LORES("change item lores", null),
+    ADD_ITEM_LORE("add item lore", AwaitingInputType.INPUT_ADD_ITEM_LORE),
+    EDIT_ITEM_LORE("edit item lore", AwaitingInputType.INPUT_EDIT_ITEM_LORE),
+    DELETE_ITEM_LORE("delete item lore", null),
 
     ;
 

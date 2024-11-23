@@ -1,6 +1,7 @@
 package com.gliesestudio.mc.quickgui.listener;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
+import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
 import com.gliesestudio.mc.quickgui.enums.SystemCommand;
 import com.gliesestudio.mc.quickgui.gui.GUI;
 import com.gliesestudio.mc.quickgui.gui.GuiHolder;
@@ -9,6 +10,7 @@ import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemAction;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemActionType;
+import com.gliesestudio.mc.quickgui.service.EditGuiService;
 import com.gliesestudio.mc.quickgui.service.EditLoreService;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
 import org.bukkit.entity.Player;
@@ -28,11 +30,13 @@ public class SystemGuiListener implements Listener {
 
     private final ChatListener chatListener;
 
+    private final EditGuiService editGuiService;
     private final EditLoreService editLoreService;
 
     public SystemGuiListener(QuickGUI plugin, ChatListener chatListener) {
         this.plugin = plugin;
         this.chatListener = chatListener;
+        this.editGuiService = plugin.getEditGuiService();
         this.editLoreService = plugin.getEditLoreService();
     }
 
@@ -53,10 +57,10 @@ public class SystemGuiListener implements Listener {
 
         GuiItem guiItem = holder.getSystemGuiItem(slot);
         if (guiItem == null) return;
-        handleGuiClick(holder, player, guiItem, clickType);
+        handleGuiClick(holder, player, guiItem, clickType, slot);
     }
 
-    private void handleGuiClick(SystemGuiHolder systemGuiHolder, Player player, GuiItem guiItem, ClickType clickType) {
+    private void handleGuiClick(SystemGuiHolder systemGuiHolder, Player player, GuiItem guiItem, ClickType clickType, int slot) {
         if (!guiItem.hasActions()) {
             log.info("There are no actions for this item");
             return;
@@ -84,7 +88,9 @@ public class SystemGuiListener implements Listener {
         // On click input commands
         if (systemCommand != null && systemCommand.getInputType() != null) {
             log.info("Awaiting {} input for player: {}", systemCommand.getInputType(), player.getUniqueId());
-            chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder);
+            if (AwaitingInputType.INPUT_EDIT_ITEM_LORE.equals(systemCommand.getInputType())) {
+                chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder, slot - 2);
+            } else chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder);
             player.closeInventory();
             return;
         } else if (systemCommand != null) {
@@ -96,7 +102,13 @@ public class SystemGuiListener implements Listener {
 
         switch (systemCommand) {
             case EDIT_ITEMS -> {
-                plugin.getEditGuiService().openGuiEditItem(player, systemGuiHolder);
+                editGuiService.openGuiEditItem(player, systemGuiHolder);
+            }
+
+            case DELETE_ITEM_LORE -> {
+                editLoreService.deleteItemLoreConfig(player, systemGuiHolder, slot - 2);
+                systemGuiHolder.getPrevSystemGui().createInventory();
+                editLoreService.openEditLoreGui(player, systemGuiHolder.getPrevSystemGui());
             }
 
             case BACK -> {

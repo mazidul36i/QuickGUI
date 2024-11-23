@@ -6,6 +6,7 @@ import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.model.AwaitingInputHolder;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
 import com.gliesestudio.mc.quickgui.service.EditItemService;
+import com.gliesestudio.mc.quickgui.service.EditLoreService;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
@@ -28,11 +29,13 @@ public class ChatListener implements Listener {
     private final QuickGUI plugin;
     private final EditGuiService editGuiService;
     private final EditItemService editItemService;
+    private final EditLoreService editLoreService;
 
     public ChatListener(QuickGUI plugin) {
         this.plugin = plugin;
         this.editGuiService = plugin.getEditGuiService();
         this.editItemService = plugin.getEditItemService();
+        this.editLoreService = plugin.getEditLoreService();
     }
 
     @EventHandler
@@ -96,7 +99,21 @@ public class ChatListener implements Listener {
                 case INPUT_ITEM_NAME -> {
                     boolean isSaved = editItemService.updateItemConfig(awaitingInputHolder.getSystemGuiHolder(), awaitingInputHolder.getInputType(), textInput);
                     if (isSaved) openAwaitingGui(player, awaitingInputHolder.getSystemGuiHolder(), true);
-                    else player.sendMessage("§cFailed to change GUI alias");
+                    else player.sendMessage("§cFailed to change GUI name");
+                }
+
+                case INPUT_ADD_ITEM_LORE -> {
+                    boolean isSaved = editLoreService.editItemLoreConfig(awaitingInputHolder.getSystemGuiHolder(),
+                            awaitingInputHolder.getInputType(), textInput, awaitingInputHolder.getEditLorePosition());
+                    if (isSaved) openAwaitingLoreGui(player, awaitingInputHolder.getSystemGuiHolder());
+                    else player.sendMessage("§cFailed to add GUI item lore");
+                }
+
+                case INPUT_EDIT_ITEM_LORE -> {
+                    boolean isSaved = editLoreService.editItemLoreConfig(awaitingInputHolder.getSystemGuiHolder(),
+                            awaitingInputHolder.getInputType(), textInput, awaitingInputHolder.getEditLorePosition());
+                    if (isSaved) openAwaitingLoreGui(player, awaitingInputHolder.getSystemGuiHolder());
+                    else player.sendMessage("§cFailed to edit GUI item lore");
                 }
 
                 // If no input has matched or not implemented
@@ -132,10 +149,27 @@ public class ChatListener implements Listener {
         });
     }
 
+    private void openAwaitingLoreGui(Player player, SystemGuiHolder systemGuiHolder) {
+        // Schedule the inventory opening on the main thread
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            editGuiService.reloadGui(systemGuiHolder.getGui().getName());
+            systemGuiHolder.getPrevSystemGui().createInventory();
+            editLoreService.openEditLoreGui(player, systemGuiHolder.getPrevSystemGui());
+        });
+    }
+
     public void addAwaitingInput(UUID playerUuid, AwaitingInputType inputType, SystemGuiHolder systemGuiHolder) {
         AwaitingInputHolder inputHolder = new AwaitingInputHolder()
                 .inputType(inputType)
                 .systemGuiHolder(systemGuiHolder);
+        awaitingInputs.put(playerUuid, inputHolder);
+    }
+
+    public void addAwaitingInput(UUID playerUuid, AwaitingInputType inputType, SystemGuiHolder systemGuiHolder, int editLorePosition) {
+        AwaitingInputHolder inputHolder = new AwaitingInputHolder()
+                .inputType(inputType)
+                .systemGuiHolder(systemGuiHolder)
+                .editLorePosition(editLorePosition);
         awaitingInputs.put(playerUuid, inputHolder);
     }
 

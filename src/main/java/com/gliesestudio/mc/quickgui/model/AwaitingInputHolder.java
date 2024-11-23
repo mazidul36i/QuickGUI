@@ -2,10 +2,12 @@ package com.gliesestudio.mc.quickgui.model;
 
 import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
 import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
+import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
 
+@Getter
 public class AwaitingInputHolder implements Serializable {
 
     @Serial
@@ -13,6 +15,7 @@ public class AwaitingInputHolder implements Serializable {
 
     private AwaitingInputType inputType;
     private SystemGuiHolder systemGuiHolder;
+    private Integer editLorePosition;
 
     public AwaitingInputHolder inputType(AwaitingInputType inputType) {
         this.inputType = inputType;
@@ -24,12 +27,9 @@ public class AwaitingInputHolder implements Serializable {
         return this;
     }
 
-    public AwaitingInputType getInputType() {
-        return inputType;
-    }
-
-    public SystemGuiHolder getSystemGuiHolder() {
-        return systemGuiHolder;
+    public AwaitingInputHolder editLorePosition(int editLorePosition) {
+        this.editLorePosition = editLorePosition;
+        return this;
     }
 
 }

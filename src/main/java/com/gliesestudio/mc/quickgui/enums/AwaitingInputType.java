@@ -9,5 +9,7 @@ public enum AwaitingInputType {
     INPUT_ALIAS,
 
     INPUT_ITEM_NAME,
+    INPUT_ADD_ITEM_LORE,
+    INPUT_EDIT_ITEM_LORE,
 
 }
