@@ -76,20 +76,4 @@ public class EditItemServiceImpl implements EditItemService {
         }
     }
 
-    // TODO: Make the lores gui dynamic
-    @Override
-    public void openEditLoreGui(@NotNull Player player, SystemGuiHolder systemGuiHolder) {
-        // Create the GUI from system resources
-        GUI editLoresGui = SystemGuiManager.getSystemGui("edit-lores");
-
-        // Verify if any GUI exists with the name.
-        if (editLoresGui == null) {
-            player.sendMessage("§cCouldn't load system edit gui for '§r" + "edit-item");
-            return;
-        }
-
-        // Open the GUI
-        SystemGuiHolder editLoresGuiHolder = new SystemGuiHolder(plugin, player, editLoresGui, systemGuiHolder.getGui(), OpenMode.EDIT_LORES, systemGuiHolder.getEditItemSlot(), systemGuiHolder);
-        player.openInventory(editLoresGuiHolder.getInventory());
-    }
 }

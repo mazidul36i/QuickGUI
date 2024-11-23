@@ -12,5 +12,4 @@ public interface EditItemService {
 
     boolean updateItemConfig(SystemGuiHolder systemGuiHolder, AwaitingInputType inputType, String newValue);
 
-    void openEditLoreGui(@NotNull Player player, SystemGuiHolder systemGuiHolder);
 }

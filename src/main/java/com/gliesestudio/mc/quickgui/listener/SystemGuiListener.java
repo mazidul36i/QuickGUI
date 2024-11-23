@@ -9,7 +9,7 @@ import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemAction;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemActionType;
-import com.gliesestudio.mc.quickgui.service.EditItemService;
+import com.gliesestudio.mc.quickgui.service.EditLoreService;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,12 +28,12 @@ public class SystemGuiListener implements Listener {
 
     private final ChatListener chatListener;
 
-    private final EditItemService editItemService;
+    private final EditLoreService editLoreService;
 
     public SystemGuiListener(QuickGUI plugin, ChatListener chatListener) {
         this.plugin = plugin;
         this.chatListener = chatListener;
-        this.editItemService = plugin.getEditItemService();
+        this.editLoreService = plugin.getEditLoreService();
     }
 
     @EventHandler
@@ -89,7 +89,7 @@ public class SystemGuiListener implements Listener {
             return;
         } else if (systemCommand != null) {
             if (SystemCommand.CHANGE_ITEM_LORES.equals(systemCommand)) {
-                editItemService.openEditLoreGui(player, systemGuiHolder);
+                editLoreService.openEditLoreGui(player, systemGuiHolder);
                 return;
             }
         }

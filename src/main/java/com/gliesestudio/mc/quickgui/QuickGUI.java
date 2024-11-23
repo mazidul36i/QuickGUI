@@ -10,10 +10,7 @@ import com.gliesestudio.mc.quickgui.listener.ChatListener;
 import com.gliesestudio.mc.quickgui.listener.GuiListener;
 import com.gliesestudio.mc.quickgui.listener.SystemGuiListener;
 import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
-import com.gliesestudio.mc.quickgui.service.EditGuiService;
-import com.gliesestudio.mc.quickgui.service.EditGuiServiceImpl;
-import com.gliesestudio.mc.quickgui.service.EditItemService;
-import com.gliesestudio.mc.quickgui.service.EditItemServiceImpl;
+import com.gliesestudio.mc.quickgui.service.*;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,6 +32,7 @@ public final class QuickGUI extends JavaPlugin {
     // Services
     private EditGuiService editGuiService;
     private EditItemService editItemService;
+    private EditLoreService editLoreService;
 
     @Override
     public void onEnable() {
@@ -48,6 +46,7 @@ public final class QuickGUI extends JavaPlugin {
         // Initialize services
         editGuiService = new EditGuiServiceImpl(this);
         editItemService = new EditItemServiceImpl(this);
+        editLoreService = new EditLoreServiceImpl(this);
 
         // Initialize commands
         openGuiCommandExecutor = new OpenGuiCommand(this);
@@ -107,8 +106,13 @@ public final class QuickGUI extends JavaPlugin {
     }
 
     public @NotNull EditItemService getEditItemService() {
-        if (editGuiService == null) editItemService = new EditItemServiceImpl(this);
+        if (editItemService == null) editItemService = new EditItemServiceImpl(this);
         return editItemService;
+    }
+
+    public @NotNull EditLoreService getEditLoreService() {
+        if (editLoreService == null) editLoreService = new EditLoreServiceImpl(this);
+        return editLoreService;
     }
 
 }
