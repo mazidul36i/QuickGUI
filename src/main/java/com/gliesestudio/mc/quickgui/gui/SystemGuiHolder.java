@@ -24,16 +24,27 @@ public class SystemGuiHolder extends GuiHolder {
     private final GUI systemGui;
     @Getter
     private final SystemGuiHolder prevSystemGui;
+    @Getter
+    private final Integer editItemSlot;
 
     public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode) {
         super(plugin, player, gui, mode);
         this.systemGui = systemGui;
         this.prevSystemGui = null;
+        this.editItemSlot = null;
     }
 
-    public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode, SystemGuiHolder prevSystemGui) {
+    public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode, Integer editItemSlot) {
         super(plugin, player, gui, mode);
         this.systemGui = systemGui;
+        this.prevSystemGui = null;
+        this.editItemSlot = editItemSlot;
+    }
+
+    public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode, Integer editItemSlot, SystemGuiHolder prevSystemGui) {
+        super(plugin, player, gui, mode);
+        this.systemGui = systemGui;
+        this.editItemSlot = editItemSlot;
         this.prevSystemGui = prevSystemGui;
     }
 
@@ -72,6 +83,18 @@ public class SystemGuiHolder extends GuiHolder {
                 if (itemStack != null) super.inventory.setItem(slot, itemStack);
             });
         }
+
+        // Add clicked item into the edit slot while editing an item.
+        if ((OpenMode.EDIT_ITEMS.equals(super.getMode()) || OpenMode.EDIT_LORES.equals(super.getMode()))
+                && editItemSlot != null && editItemSlot < invSize) {
+            GuiItem guiItem = super.gui.getItem(editItemSlot);
+            ItemStack itemStack = guiItem.createItemStack(super.player, placeholders);
+            if (itemStack != null) {
+                if (OpenMode.EDIT_ITEMS.equals(super.getMode())) super.inventory.setItem(4, itemStack);
+                if (OpenMode.EDIT_LORES.equals(super.getMode())) super.inventory.setItem(0, itemStack);
+            }
+        }
+
         return super.inventory;
     }
 
