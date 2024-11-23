@@ -106,4 +106,7 @@ public class GUI implements Serializable {
         return Objects.hashCode(name);
     }
 
+    public GuiItem getItem(Integer itemSlot) {
+        return items.get(itemSlot);
+    }
 }

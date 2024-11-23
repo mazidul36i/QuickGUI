@@ -67,6 +67,10 @@ items:
       display-name: "&9Change Displayname"
       lore:
         - "&7Change the name of the item"
+    actions:
+      left:
+        commands:
+          - "change item name"
 
   11:
     item:
@@ -75,6 +79,10 @@ items:
       display-name: "&9Change Lores"
       lore:
         - "&7Change the lores of the item"
+    actions:
+      left:
+        commands:
+          - "change item lores"
 
   12:
     item:

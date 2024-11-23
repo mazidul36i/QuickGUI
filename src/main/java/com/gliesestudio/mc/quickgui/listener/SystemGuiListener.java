@@ -9,6 +9,7 @@ import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemAction;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemActionType;
+import com.gliesestudio.mc.quickgui.service.EditItemService;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,9 +28,12 @@ public class SystemGuiListener implements Listener {
 
     private final ChatListener chatListener;
 
+    private final EditItemService editItemService;
+
     public SystemGuiListener(QuickGUI plugin, ChatListener chatListener) {
         this.plugin = plugin;
         this.chatListener = chatListener;
+        this.editItemService = plugin.getEditItemService();
     }
 
     @EventHandler
@@ -75,6 +79,7 @@ public class SystemGuiListener implements Listener {
 
         String command = action.getCommands().getFirst();
         SystemCommand systemCommand = SystemCommand.fromString(command);
+        log.info("Command: {} and system command: {}", command, systemCommand);
 
         // On click input commands
         if (systemCommand != null && systemCommand.getInputType() != null) {
@@ -82,6 +87,11 @@ public class SystemGuiListener implements Listener {
             chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder);
             player.closeInventory();
             return;
+        } else if (systemCommand != null) {
+            if (SystemCommand.CHANGE_ITEM_LORES.equals(systemCommand)) {
+                editItemService.openEditLoreGui(player, systemGuiHolder);
+                return;
+            }
         }
 
         switch (systemCommand) {

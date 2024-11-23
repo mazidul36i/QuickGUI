@@ -8,4 +8,6 @@ public enum AwaitingInputType {
     INPUT_PERMISSION,
     INPUT_ALIAS,
 
+    INPUT_ITEM_NAME,
+
 }

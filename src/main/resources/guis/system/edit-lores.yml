@@ -1,0 +1,48 @@
+name: edit-lores
+title: "&9Edit Lores"
+permission: "quickqui.edit"
+rows: 1
+
+# List of items in the GUI.
+items:
+  # Row 1
+  #  0: Empty placeholder for item which is being edited.
+
+  1:
+    item:
+      name: "WRITABLE_BOOK"
+      type: "system_button"
+      display-name: "&6INFO"
+      lore:
+        - "&bLeft click"
+        - "&3Edit"
+        - ""
+        - "&bRight click"
+        - "&3Delete"
+        - ""
+        - "&7Use color codes to customize lore"
+        - "&f<EMPTY>&7: Add an empty line to the lore"
+
+  2:
+    item:
+      name: "PLAYER_HEAD"
+      type: "system_button"
+      display-name: "&aAdd Lore"
+      lore:
+        - "&3Click to add a new lore"
+      texture: "PUMPKIN_PLUS"
+    actions:
+      left:
+        commands:
+          - "add lore"
+
+  8:
+    item:
+      name: "PLAYER_HEAD"
+      type: "system_button"
+      display-name: "&cBack"
+      texture: "BACK"
+    actions:
+      left:
+        commands:
+          - "back"

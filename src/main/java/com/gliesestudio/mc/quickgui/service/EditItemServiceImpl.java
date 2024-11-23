@@ -1,16 +1,21 @@
 package com.gliesestudio.mc.quickgui.service;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
+import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
 import com.gliesestudio.mc.quickgui.gui.GUI;
 import com.gliesestudio.mc.quickgui.gui.GuiHolder;
 import com.gliesestudio.mc.quickgui.gui.OpenMode;
 import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
+import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
+import com.gliesestudio.mc.quickgui.gui.item.GuiItemInfo;
 import com.gliesestudio.mc.quickgui.manager.SystemGuiManager;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 public class EditItemServiceImpl implements EditItemService {
@@ -44,12 +49,47 @@ public class EditItemServiceImpl implements EditItemService {
             return;
         }
 
-        // Add clicked item into the edit slot (4)
-        editItemGui.updateItem(EDIT_ITEM_SLOT, guiHolder.getGuiItem(itemSlot));
-
         // Open the GUI
-        SystemGuiHolder editItemGuiHolder = new SystemGuiHolder(plugin, player, editItemGui, guiHolder.getGui(), OpenMode.EDIT_ITEMS);
+        SystemGuiHolder editItemGuiHolder = new SystemGuiHolder(plugin, player, editItemGui, guiHolder.getGui(), OpenMode.EDIT_ITEMS, itemSlot);
         player.openInventory(editItemGuiHolder.getInventory());
     }
 
+    @Override
+    public boolean updateItemConfig(SystemGuiHolder systemGuiHolder, AwaitingInputType inputType, String newValue) {
+        GUI gui = systemGuiHolder.getGui();
+        if (gui == null) return false;
+        GuiItem guiItem = gui.getItem(systemGuiHolder.getEditItemSlot());
+        GuiItemInfo itemInfo = guiItem.getItem();
+
+        if (AwaitingInputType.INPUT_ITEM_NAME.equals(inputType)) {
+            itemInfo.setDisplayName(newValue);
+        }
+
+        File guiConfigFile = new File(guiFolder, systemGuiHolder.getGui().getName() + ".yml");
+        FileConfiguration guiConfig = gui.serialize();
+
+        try {
+            guiConfig.save(guiConfigFile);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    // TODO: Make the lores gui dynamic
+    @Override
+    public void openEditLoreGui(@NotNull Player player, SystemGuiHolder systemGuiHolder) {
+        // Create the GUI from system resources
+        GUI editLoresGui = SystemGuiManager.getSystemGui("edit-lores");
+
+        // Verify if any GUI exists with the name.
+        if (editLoresGui == null) {
+            player.sendMessage("§cCouldn't load system edit gui for '§r" + "edit-item");
+            return;
+        }
+
+        // Open the GUI
+        SystemGuiHolder editLoresGuiHolder = new SystemGuiHolder(plugin, player, editLoresGui, systemGuiHolder.getGui(), OpenMode.EDIT_LORES, systemGuiHolder.getEditItemSlot(), systemGuiHolder);
+        player.openInventory(editLoresGuiHolder.getInventory());
+    }
 }

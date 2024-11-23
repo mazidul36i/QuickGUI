@@ -5,6 +5,7 @@ import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
 import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.model.AwaitingInputHolder;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
+import com.gliesestudio.mc.quickgui.service.EditItemService;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
@@ -26,10 +27,12 @@ public class ChatListener implements Listener {
 
     private final QuickGUI plugin;
     private final EditGuiService editGuiService;
+    private final EditItemService editItemService;
 
-    public ChatListener(QuickGUI plugin, EditGuiService editGuiService) {
+    public ChatListener(QuickGUI plugin) {
         this.plugin = plugin;
-        this.editGuiService = editGuiService;
+        this.editGuiService = plugin.getEditGuiService();
+        this.editItemService = plugin.getEditItemService();
     }
 
     @EventHandler
@@ -90,6 +93,12 @@ public class ChatListener implements Listener {
                     else player.sendMessage("§cFailed to change GUI alias");
                 }
 
+                case INPUT_ITEM_NAME -> {
+                    boolean isSaved = editItemService.updateItemConfig(awaitingInputHolder.getSystemGuiHolder(), awaitingInputHolder.getInputType(), textInput);
+                    if (isSaved) openAwaitingGui(player, awaitingInputHolder.getSystemGuiHolder(), true);
+                    else player.sendMessage("§cFailed to change GUI alias");
+                }
+
                 // If no input has matched or not implemented
                 case null, default -> player.sendMessage("§eUnknown input");
             }
@@ -97,6 +106,14 @@ public class ChatListener implements Listener {
             // Remove player from the waiting map
             awaitingInputs.remove(player.getUniqueId());
         }
+    }
+
+    private void openAwaitingGui(Player player, SystemGuiHolder systemGuiHolder, boolean reload) {
+        // Schedule the inventory opening on the main thread
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (reload) editGuiService.reloadGui(systemGuiHolder.getGui().getName());
+            player.openInventory(systemGuiHolder.createInventory());
+        });
     }
 
     private void openEditGuiBack(Player player, String name, boolean reload) {

@@ -53,7 +53,7 @@ public final class QuickGUI extends JavaPlugin {
         openGuiCommandExecutor = new OpenGuiCommand(this);
 
         // Initialize listeners
-        chatListener = new ChatListener(this, editGuiService);
+        chatListener = new ChatListener(this);
 
         registerEvents();
         registerCommands();
