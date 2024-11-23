@@ -14,6 +14,7 @@ public enum SystemCommand {
     EDIT_ITEMS("edit items", null),
     BACK("back", null),
 
+    TOGGLE_ITEM_GLOW("toggle item glow", null),
     CHANGE_ITEM_NAME("change item name", AwaitingInputType.INPUT_ITEM_NAME),
 
     CHANGE_ITEM_LORES("change item lores", null),

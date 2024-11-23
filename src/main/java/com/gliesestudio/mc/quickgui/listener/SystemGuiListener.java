@@ -11,6 +11,7 @@ import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemAction;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemActionType;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
+import com.gliesestudio.mc.quickgui.service.EditItemService;
 import com.gliesestudio.mc.quickgui.service.EditLoreService;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
 import org.bukkit.entity.Player;
@@ -22,7 +23,6 @@ import org.bukkit.inventory.Inventory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class SystemGuiListener implements Listener {
 
     private static final Logger log = LoggerFactory.getLogger(SystemGuiListener.class);
@@ -31,12 +31,14 @@ public class SystemGuiListener implements Listener {
     private final ChatListener chatListener;
 
     private final EditGuiService editGuiService;
+    private final EditItemService editItemService;
     private final EditLoreService editLoreService;
 
     public SystemGuiListener(QuickGUI plugin, ChatListener chatListener) {
         this.plugin = plugin;
         this.chatListener = chatListener;
         this.editGuiService = plugin.getEditGuiService();
+        this.editItemService = plugin.getEditItemService();
         this.editLoreService = plugin.getEditLoreService();
     }
 
@@ -103,6 +105,11 @@ public class SystemGuiListener implements Listener {
         switch (systemCommand) {
             case EDIT_ITEMS -> {
                 editGuiService.openGuiEditItem(player, systemGuiHolder);
+            }
+
+            case TOGGLE_ITEM_GLOW -> {
+                editItemService.toggleItemGlow(player, systemGuiHolder);
+                player.openInventory(systemGuiHolder.createInventory());
             }
 
             case DELETE_ITEM_LORE -> {

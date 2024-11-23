@@ -12,4 +12,6 @@ public interface EditItemService {
 
     boolean updateItemConfig(SystemGuiHolder systemGuiHolder, AwaitingInputType inputType, String newValue);
 
+    void toggleItemGlow(Player player, SystemGuiHolder systemGuiHolder);
+
 }

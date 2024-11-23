@@ -65,10 +65,9 @@ public class EditItemServiceImpl implements EditItemService {
             itemInfo.setDisplayName(newValue);
         }
 
-        File guiConfigFile = new File(guiFolder, systemGuiHolder.getGui().getName() + ".yml");
-        FileConfiguration guiConfig = gui.serialize();
-
         try {
+            File guiConfigFile = new File(guiFolder, systemGuiHolder.getGui().getName() + ".yml");
+            FileConfiguration guiConfig = gui.serialize();
             guiConfig.save(guiConfigFile);
             return true;
         } catch (IOException e) {
@@ -76,4 +75,21 @@ public class EditItemServiceImpl implements EditItemService {
         }
     }
 
+    @Override
+    public void toggleItemGlow(Player player, SystemGuiHolder systemGuiHolder) {
+        log.info("Toggle item glow for item slot: {}", systemGuiHolder.getEditItemSlot());
+        GUI gui = systemGuiHolder.getGui();
+        if (gui == null) return;
+        GuiItem guiItem = gui.getItem(systemGuiHolder.getEditItemSlot());
+        GuiItemInfo itemInfo = guiItem.getItem();
+        itemInfo.setGlow(!itemInfo.isGlow());
+
+        // Save the GUI configuration
+        try {
+            File guiConfigFile = new File(guiFolder, systemGuiHolder.getGui().getName() + ".yml");
+            FileConfiguration guiConfig = gui.serialize();
+            guiConfig.save(guiConfigFile);
+        } catch (IOException ignored) {
+        }
+    }
 }

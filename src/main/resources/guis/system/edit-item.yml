@@ -95,6 +95,10 @@ items:
       name: "ENCHANTED_BOOK"
       type: "system_button"
       display-name: "&9Toggle Glow"
+    actions:
+      left:
+        commands:
+          - "toggle item glow"
 
   14:
     item:
