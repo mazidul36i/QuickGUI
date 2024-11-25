@@ -57,6 +57,14 @@ public class GuiItem implements Serializable {
     }
 
     @Nullable
+    public GuiItemAction getAction(GuiItemActionType actionType) {
+        if (hasActions()) {
+            return actions.get(actionType);
+        }
+        return null;
+    }
+
+    @Nullable
     public ItemStack createItemStack(Player player) {
         return createItemStack(player, null);
     }
@@ -112,6 +120,33 @@ public class GuiItem implements Serializable {
             itemStack.setItemMeta(meta);
         }
         return itemStack;
+    }
+
+    public Map<String, String> createActionPlaceholders() {
+        Map<String, String> placeholders = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(actions)) {
+            actions.forEach((actionType, action) -> {
+                if (CollectionUtils.isNotEmpty(action.getCommands())) {
+                    String commandsStr = String.join("\n>> ", action.getCommands());
+                    String actionPlaceholderName = switch (actionType) {
+                        case LEFT -> SystemPlaceholder.ACTION_LEFT_CLICK;
+                        case SHIFT_LEFT -> SystemPlaceholder.ACTION_SHIFT_LEFT_CLICK;
+                        case MIDDLE -> SystemPlaceholder.ACTION_MIDDLE_CLICK;
+                        case RIGHT -> SystemPlaceholder.ACTION_RIGHT_CLICK;
+                        case SHIFT_RIGHT -> SystemPlaceholder.ACTION_SHIFT_RIGHT_CLICK;
+                    };
+                    placeholders.put(actionPlaceholderName, commandsStr);
+                }
+            });
+        }
+
+        placeholders.putIfAbsent(SystemPlaceholder.ACTION_LEFT_CLICK, "NONE");
+        placeholders.putIfAbsent(SystemPlaceholder.ACTION_SHIFT_LEFT_CLICK, "NONE");
+        placeholders.putIfAbsent(SystemPlaceholder.ACTION_MIDDLE_CLICK, "NONE");
+        placeholders.putIfAbsent(SystemPlaceholder.ACTION_RIGHT_CLICK, "NONE");
+        placeholders.putIfAbsent(SystemPlaceholder.ACTION_SHIFT_RIGHT_CLICK, "NONE");
+
+        return placeholders;
     }
 
     public static GuiItem deserialize(ConfigurationSection itemConfig) {

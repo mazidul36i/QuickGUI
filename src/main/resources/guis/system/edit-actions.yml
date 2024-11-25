@@ -1,5 +1,5 @@
-name: edit-item
-title: "&9Edit Item"
+name: edit-actions
+title: "&9Edit Actions"
 permission: "quickqui.edit"
 rows: 5
 
@@ -26,16 +26,21 @@ items:
       name: "GRAY_STAINED_GLASS_PANE"
       type: "system_filler"
       hide-tooltip: true
-
-  #  4: Empty placeholder for item which is being edited.
+  4:
+    item:
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
 
   5:
     item:
-      name: "WRITABLE_BOOK"
+      name: "PLAYER_HEAD"
       type: "system_button"
-      display-name: "&6Edit Item"
+      display-name: "&6Change Currency"
+      texture: "COIN"
       lore:
-        - "&7<- &bLeft click with an item to switch"
+        - "&aVault"
+        - "&7PlayerPoints"
 
   6:
     item:
@@ -62,59 +67,74 @@ items:
 
   10:
     item:
-      name: "POPPY"
+      name: "GOLDEN_HORSE_ARMOR"
       type: "system_button"
-      display-name: "&9Change Displayname"
+      display-name: "&9Change Permission"
       lore:
-        - "&7Change the name of the item"
-    actions:
-      left:
-        commands:
-          - "change item name"
+        - "&7Change the click permission"
+        - ""
+        - "&aNONE &7for no permission"
+        - ""
+        - "&7Current: &a%item-action-permission%"
 
   11:
     item:
-      name: "DANDELION"
+      name: "CLOCK"
       type: "system_button"
-      display-name: "&9Change Lores"
+      display-name: "&9Change Cooldown"
       lore:
-        - "&7Change the lores of the item"
-    actions:
-      left:
-        commands:
-          - "change item lores"
+        - ""
+        - "&7Units"
+        - "&ams&7, &as&7, &am&7, &ah&7, &ad"
+        - ""
+        - "&7Current: &a%item-action-cooldown%"
 
   12:
     item:
-      name: "GRAY_STAINED_GLASS_PANE"
-      type: "system_filler"
-      hide-tooltip: true
+      name: "CHEST"
+      type: "system_button"
+      display-name: "&9Toggle close GUI"
+      lore:
+        - "&7Close GUI before executing commands?"
+        - ""
+        - "&7Current: &a%item-action-close-inventory%"
 
   13:
     item:
-      name: "ENCHANTED_BOOK"
-      type: "system_button"
-      display-name: "&9Toggle Glow"
-    actions:
-      left:
-        commands:
-          - "toggle item glow"
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
 
   14:
     item:
-      name: "GRAY_STAINED_GLASS_PANE"
-      type: "system_filler"
-      hide-tooltip: true
+      name: "GOLD_NUGGET"
+      type: "system_button"
+      display-name: "&9Change Money Price"
+      lore:
+        - "&7Pay money per click"
+        - ""
+        - "&7Current: &a%item-action-money-price%"
+
   15:
     item:
-      name: "GRAY_STAINED_GLASS_PANE"
-      type: "system_filler"
-      hide-tooltip: true
+      name: "DIAMOND"
+      type: "system_button"
+      display-name: "&9Change Item Price"
+      lore:
+        - "&7Pay items per click"
+        - ""
+        - "&7Current: &a%item-action-item-price%"
+
   16:
     item:
-      name: "GRAY_STAINED_GLASS_PANE"
-      type: "system_filler"
-      hide-tooltip: true
+      name: "EXPERIENCE_BOTTLE"
+      type: "system_button"
+      display-name: "&9Change Exp Price"
+      lore:
+        - "&7Pay experience per click"
+        - ""
+        - "&7Current: &a%item-action-exp-price%"
+
   17:
     item:
       name: "GRAY_STAINED_GLASS_PANE"
@@ -171,79 +191,34 @@ items:
   # Row 4
   27:
     item:
-      name: "KNOWLEDGE_BOOK"
-      type: "system_button"
-      display-name: "&6&lActions"
-      lore:
-        - "&bActions get called if you click the Item"
-        - "&bYou can set different Requirements"
+      name: "GRAY_STAINED_GLASS_PANE"
+      type: "system_filler"
+      hide-tooltip: true
 
   28:
     item:
-      name: "PLAYER_HEAD"
+      name: "WRITABLE_BOOK"
       type: "system_button"
-      display-name: "&9Left Click Action"
-      texture: "ARROW_LEFT"
-    actions:
-      left:
-        commands:
-          - "edit item action left"
+      display-name: "&6&lCommands Info"
+      lore:
+        - "&f<PLAYER> &7will be replaced with the Target/Viewer player"
+        - "&fServer Example: &7<SERVER>kill <PLAYER>"
+        - "&fMessage Example: &7<MSG>&a[SHOP]&7 You bought an Item"
+        - "&fBungee Example: &7<CONNECT> server"
+        - "&fPlayer OP Example: &7<OP> heal"
+        - "&fSound Example: &7<SOUND>note.pling"
+        - "&fPrev. GUI Example: &7<BACK>"
+        - "&fPlayer Example: &7opengui welcome"
+        - ""
+        - "&fLeft click: &7Edit"
+        - "&fRight click: &7Delete"
 
   29:
     item:
       name: "PLAYER_HEAD"
       type: "system_button"
-      display-name: "&9Shift Left Click Action"
-      texture: "ARROW_UP_LEFT"
-    actions:
-      left:
-        commands:
-          - "edit item action shift-left"
-
-  30:
-    item:
-      name: "GRAY_STAINED_GLASS_PANE"
-      type: "system_filler"
-      hide-tooltip: true
-
-  31:
-    item:
-      name: "PLAYER_HEAD"
-      type: "system_button"
-      display-name: "&9Middle Click Action"
-      texture: "ARROW_UP"
-    actions:
-      left:
-        commands:
-          - "edit item action middle"
-
-  32:
-    item:
-      name: "GRAY_STAINED_GLASS_PANE"
-      type: "system_filler"
-      hide-tooltip: true
-
-  33:
-    item:
-      name: "PLAYER_HEAD"
-      type: "system_button"
-      display-name: "&9Right Click Action"
-      texture: "ARROW_RIGHT"
-    actions:
-      left:
-        commands:
-          - "edit item action right"
-
-  34:
-    item:
-      name: "PLAYER_HEAD"
-      type: "system_button"
-      display-name: "&9Shift Right Click Action"
-      texture: "ARROW_UP_RIGHT"
-    actions:
-      left:
-        commands:
-          - "edit item action shift-right"
+      display-name: "&aAdd Command"
+      texture: "PUMPKIN_PLUS"
 
   35:
     item:
@@ -295,8 +270,9 @@ items:
   44:
     item:
       name: "PLAYER_HEAD"
-      type: "system_button"
+      type: "system_filler"
       display-name: "&cBack"
+      hide-tooltip: false
       texture: "BACK"
     actions:
       left:

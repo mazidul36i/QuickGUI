@@ -31,7 +31,6 @@ public class EditLoreServiceImpl implements EditLoreService {
         this.guiFolder = new File(plugin.getDataFolder(), "guis");
     }
 
-    // TODO: Make the lores gui dynamic
     @Override
     public void openEditLoreGui(@NotNull Player player, SystemGuiHolder systemGuiHolder) {
         // Create the GUI from system resources

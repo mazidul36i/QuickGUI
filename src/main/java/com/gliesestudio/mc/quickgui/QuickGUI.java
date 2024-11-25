@@ -33,6 +33,7 @@ public final class QuickGUI extends JavaPlugin {
     private EditGuiService editGuiService;
     private EditItemService editItemService;
     private EditLoreService editLoreService;
+    private EditActionService editActionService;
 
     @Override
     public void onEnable() {
@@ -47,6 +48,7 @@ public final class QuickGUI extends JavaPlugin {
         editGuiService = new EditGuiServiceImpl(this);
         editItemService = new EditItemServiceImpl(this);
         editLoreService = new EditLoreServiceImpl(this);
+        editActionService = new EditActionServiceImpl(this);
 
         // Initialize commands
         openGuiCommandExecutor = new OpenGuiCommand(this);
@@ -113,6 +115,11 @@ public final class QuickGUI extends JavaPlugin {
     public @NotNull EditLoreService getEditLoreService() {
         if (editLoreService == null) editLoreService = new EditLoreServiceImpl(this);
         return editLoreService;
+    }
+
+    public @NotNull EditActionService getEditActionService() {
+        if (editActionService == null) editActionService = new EditActionServiceImpl(this);
+        return editActionService;
     }
 
 }

@@ -22,6 +22,12 @@ public enum SystemCommand {
     EDIT_ITEM_LORE("edit item lore", AwaitingInputType.INPUT_EDIT_ITEM_LORE),
     DELETE_ITEM_LORE("delete item lore", null),
 
+    EDIT_ITEM_ACTION_LEFT("edit item action left", null),
+    EDIT_ITEM_ACTION_SHIFT_LEFT("edit item action shift-left", null),
+    EDIT_ITEM_ACTION_MIDDLE("edit item action middle", null),
+    EDIT_ITEM_ACTION_RIGHT("edit item action right", null),
+    EDIT_ITEM_ACTION_SHIFT_RIGHT("edit item action shift-right", null),
+
     ;
 
     private final String command;

@@ -10,6 +10,7 @@ import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemAction;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemActionType;
+import com.gliesestudio.mc.quickgui.service.EditActionService;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
 import com.gliesestudio.mc.quickgui.service.EditItemService;
 import com.gliesestudio.mc.quickgui.service.EditLoreService;
@@ -33,6 +34,7 @@ public class SystemGuiListener implements Listener {
     private final EditGuiService editGuiService;
     private final EditItemService editItemService;
     private final EditLoreService editLoreService;
+    private final EditActionService editActionService;
 
     public SystemGuiListener(QuickGUI plugin, ChatListener chatListener) {
         this.plugin = plugin;
@@ -40,6 +42,7 @@ public class SystemGuiListener implements Listener {
         this.editGuiService = plugin.getEditGuiService();
         this.editItemService = plugin.getEditItemService();
         this.editLoreService = plugin.getEditLoreService();
+        this.editActionService = plugin.getEditActionService();
     }
 
     @EventHandler
@@ -95,16 +98,20 @@ public class SystemGuiListener implements Listener {
             } else chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder);
             player.closeInventory();
             return;
-        } else if (systemCommand != null) {
-            if (SystemCommand.CHANGE_ITEM_LORES.equals(systemCommand)) {
-                editLoreService.openEditLoreGui(player, systemGuiHolder);
-                return;
-            }
         }
 
         switch (systemCommand) {
-            case EDIT_ITEMS -> {
-                editGuiService.openGuiEditItem(player, systemGuiHolder);
+            case EDIT_ITEMS -> editGuiService.openGuiEditItem(player, systemGuiHolder);
+
+            case CHANGE_ITEM_LORES -> editLoreService.openEditLoreGui(player, systemGuiHolder);
+
+            case EDIT_ITEM_ACTION_LEFT,
+                 EDIT_ITEM_ACTION_SHIFT_LEFT,
+                 EDIT_ITEM_ACTION_MIDDLE,
+                 EDIT_ITEM_ACTION_RIGHT,
+                 EDIT_ITEM_ACTION_SHIFT_RIGHT -> {
+                player.closeInventory();
+                editActionService.openEditActionGui(player, systemGuiHolder, systemCommand);
             }
 
             case TOGGLE_ITEM_GLOW -> {

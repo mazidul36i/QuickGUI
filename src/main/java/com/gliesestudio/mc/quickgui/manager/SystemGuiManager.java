@@ -24,7 +24,7 @@ public class SystemGuiManager {
     }
 
     private static void loadGuis(@NotNull QuickGUI plugin) {
-        Set<String> systemGuiNames = Set.of("edit-gui", "edit-item", "edit-lores");
+        Set<String> systemGuiNames = Set.of("edit-gui", "edit-item", "edit-actions");
 
         systemGuiNames.forEach(name -> {
             GUI editGui = createGuiFromSystemResource(plugin, name);
