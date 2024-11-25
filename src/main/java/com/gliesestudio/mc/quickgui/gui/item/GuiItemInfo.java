@@ -1,6 +1,10 @@
 package com.gliesestudio.mc.quickgui.gui.item;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class GuiItemInfo implements Serializable {
 
     @Serial
@@ -41,7 +48,18 @@ public class GuiItemInfo implements Serializable {
     public static GuiItemInfo fromItemStack(@NotNull ItemStack itemStack) {
         GuiItemInfo itemInfo = new GuiItemInfo();
         itemInfo.setName(itemStack.getType().toString());
+        if (itemStack.hasItemMeta()) {
+            itemStack.getItemMeta().displayName(); // TODO: get item meta from item stack like display name and lore
+        }
         itemInfo.setType(GuiItemType.BUTTON);
+        return itemInfo;
+    }
+
+    public static GuiItemInfo fromMaterial(Material material, GuiItemType itemType, boolean hideTooltip) {
+        GuiItemInfo itemInfo = new GuiItemInfo();
+        itemInfo.setName(material.name());
+        itemInfo.setType(itemType);
+        itemInfo.setHideTooltip(hideTooltip);
         return itemInfo;
     }
 

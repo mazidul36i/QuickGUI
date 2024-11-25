@@ -2,7 +2,6 @@ package com.gliesestudio.mc.quickgui.gui;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
-import com.gliesestudio.mc.quickgui.gui.item.GuiItemAction;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemActionType;
 import com.gliesestudio.mc.quickgui.placeholder.SystemPlaceholder;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
@@ -99,9 +98,6 @@ public class SystemGuiHolder extends GuiHolder {
                 OpenMode.EDIT_ACTIONS.equals(super.getMode()))
                 && editItemSlot != null && editItemSlot < invSize) {
             GuiItem guiItem = super.gui.getItem(editItemSlot);
-
-            GuiItemAction guiItemAction = guiItem.getAction(itemActionType);
-            log.info("Gui item action: {}", guiItemAction);
 
             ItemStack itemStack = guiItem.createItemStack(super.player, placeholders);
             if (itemStack != null) {
