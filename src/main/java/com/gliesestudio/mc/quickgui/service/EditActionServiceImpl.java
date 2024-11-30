@@ -7,6 +7,7 @@ import com.gliesestudio.mc.quickgui.gui.GUI;
 import com.gliesestudio.mc.quickgui.gui.OpenMode;
 import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.gui.item.*;
+import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
 import com.gliesestudio.mc.quickgui.utility.Constants;
 import com.gliesestudio.mc.quickgui.utility.StringUtils;
 import org.bukkit.Material;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+// TODO: Make implementation for changes and saving of item actions...
 public class EditActionServiceImpl implements EditActionService {
 
     private static final Logger log = LoggerFactory.getLogger(EditLoreServiceImpl.class);
@@ -64,7 +66,13 @@ public class EditActionServiceImpl implements EditActionService {
         actionGui.setTitle("&9Edit Actions");
         actionGui.setPermission("quickqui.edit");
         actionGui.setRows(5);
-        actionGui.setItems(createStaticActionGuiItems(editItem.getAction(itemActionType)));
+
+        Map<Integer, GuiItem> guiItemMap = new HashMap<>();
+        guiItemMap.put(4, editItem);
+        guiItemMap.putAll(createStaticActionGuiItems(editItem.getAction(itemActionType)));
+        guiItemMap.putAll(createCommandsGuiItems(editItem.getAction(itemActionType)));
+
+        actionGui.setItems(guiItemMap);
         return actionGui;
     }
 
@@ -82,7 +90,7 @@ public class EditActionServiceImpl implements EditActionService {
         String expPrice = Constants.NONE;
 
         // Create filler items
-        Set<Integer> fillerSlots = Set.of(0, 1, 2, 3, 4, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43);
+        Set<Integer> fillerSlots = Set.of(0, 1, 2, 3, 5, 6, 8, 9, 13, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43);
         GuiItem fillerItem = new GuiItem();
         fillerItem.setItem(GuiItemInfo.fromMaterial(Material.GRAY_STAINED_GLASS_PANE, GuiItemType.SYSTEM_FILLER, true));
         fillerSlots.forEach(slot -> guiItemMap.put(slot, fillerItem));
@@ -97,7 +105,7 @@ public class EditActionServiceImpl implements EditActionService {
                 .type(GuiItemType.SYSTEM_BUTTON)
                 .hideTooltip(false)
                 .build());
-        guiItemMap.put(5, changeCurrency);
+        guiItemMap.put(7, changeCurrency);
 
         // Create row-2 items
         GuiItem changePermission = new GuiItem();
@@ -204,16 +212,6 @@ public class EditActionServiceImpl implements EditActionService {
                 .build());
         guiItemMap.put(28, commandsInfo);
 
-        GuiItem addCommand = new GuiItem();
-        addCommand.setItem(GuiItemInfo.builder()
-                .name(Material.PLAYER_HEAD.name())
-                .displayName("&aAdd Command")
-                .texture(PlayerHead.PUMPKIN_PLUS.name())
-                .type(GuiItemType.SYSTEM_BUTTON)
-                .hideTooltip(false)
-                .build());
-        guiItemMap.put(29, addCommand);
-
         // Create row-5 items
         GuiItem back = new GuiItem();
         back.setItem(GuiItemInfo.builder()
@@ -229,6 +227,53 @@ public class EditActionServiceImpl implements EditActionService {
         guiItemMap.put(44, back);
 
         return guiItemMap;
+    }
+
+    private Map<Integer, GuiItem> createCommandsGuiItems(GuiItemAction itemAction) {
+        Map<Integer, GuiItem> commandsItemMap = new HashMap<>();
+
+        GuiItem addCommandItem = new GuiItem();
+        addCommandItem.setItem(GuiItemInfo.builder()
+                .name(Material.PLAYER_HEAD.name())
+                .displayName("&aAdd Command")
+                .texture(PlayerHead.PUMPKIN_PLUS.name())
+                .type(GuiItemType.SYSTEM_BUTTON)
+                .hideTooltip(false)
+                .build());
+
+        if (itemAction == null || CollectionUtils.isEmpty(itemAction.getCommands())) {
+            commandsItemMap.put(29, addCommandItem);
+            return commandsItemMap;
+        }
+
+        List<String> commands = itemAction.getCommands().stream().filter(StringUtils::hasText).toList();
+        for (int i = 0; i < commands.size(); i++) {
+            commandsItemMap.put(i + 29, createCommandGuiItem(commands.get(i)));
+        }
+
+        commandsItemMap.put(29 + commands.size(), addCommandItem);
+        return commandsItemMap;
+    }
+
+    private static @NotNull GuiItem createCommandGuiItem(@NotNull String command) {
+        GuiItem guiItem = new GuiItem();
+        GuiItemInfo itemInfo = new GuiItemInfo();
+        itemInfo.setName("BOOK");
+        itemInfo.setType(GuiItemType.SYSTEM_BUTTON);
+        itemInfo.setDisplayName("&a" + command);
+        guiItem.setItem(itemInfo);
+
+        // Gui actions
+        GuiItemAction leftAction = new GuiItemAction();
+        GuiItemAction rightAction = new GuiItemAction();
+        leftAction.setCommands(List.of("edit item action-left command"));
+        rightAction.setCommands(List.of("delete item action-left command"));
+
+        guiItem.setActions(Map.of(
+                GuiItemActionType.LEFT, leftAction,
+                GuiItemActionType.RIGHT, rightAction
+        ));
+        return guiItem;
     }
 
 }
