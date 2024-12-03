@@ -15,7 +15,7 @@ public class AwaitingInputHolder implements Serializable {
 
     private AwaitingInputType inputType;
     private SystemGuiHolder systemGuiHolder;
-    private Integer editLorePosition;
+    private Integer editItemPosition;
 
     public AwaitingInputHolder inputType(AwaitingInputType inputType) {
         this.inputType = inputType;
@@ -27,8 +27,8 @@ public class AwaitingInputHolder implements Serializable {
         return this;
     }
 
-    public AwaitingInputHolder editLorePosition(int editLorePosition) {
-        this.editLorePosition = editLorePosition;
+    public AwaitingInputHolder editItemPosition(Integer editItemPosition) {
+        this.editItemPosition = editItemPosition;
         return this;
     }
 

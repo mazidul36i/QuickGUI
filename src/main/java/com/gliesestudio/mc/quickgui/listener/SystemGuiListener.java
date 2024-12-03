@@ -24,6 +24,10 @@ import org.bukkit.inventory.Inventory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
+import static com.gliesestudio.mc.quickgui.enums.SystemCommand.*;
+
 public class SystemGuiListener implements Listener {
 
     private static final Logger log = LoggerFactory.getLogger(SystemGuiListener.class);
@@ -95,6 +99,9 @@ public class SystemGuiListener implements Listener {
             log.info("Awaiting {} input for player: {}", systemCommand.getInputType(), player.getUniqueId());
             if (AwaitingInputType.INPUT_EDIT_ITEM_LORE.equals(systemCommand.getInputType())) {
                 chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder, slot - 2);
+            } else if (List.of(EDIT_ITEM_ACTION_LEFT_COMMAND, EDIT_ITEM_ACTION_SHIFT_LEFT_COMMAND, EDIT_ITEM_ACTION_MIDDLE_COMMAND,
+                    EDIT_ITEM_ACTION_RIGHT_COMMAND, EDIT_ITEM_ACTION_SHIFT_RIGHT_COMMAND).contains(systemCommand)) {
+                chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder, slot - 29);
             } else chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder);
             player.closeInventory();
             return;
@@ -109,10 +116,8 @@ public class SystemGuiListener implements Listener {
                  EDIT_ITEM_ACTION_SHIFT_LEFT,
                  EDIT_ITEM_ACTION_MIDDLE,
                  EDIT_ITEM_ACTION_RIGHT,
-                 EDIT_ITEM_ACTION_SHIFT_RIGHT -> {
-                player.closeInventory();
-                editActionService.openEditActionGui(player, systemGuiHolder, systemCommand);
-            }
+                 EDIT_ITEM_ACTION_SHIFT_RIGHT ->
+                    editActionService.openEditActionGui(player, systemGuiHolder, systemCommand);
 
             case TOGGLE_ITEM_GLOW -> {
                 editItemService.toggleItemGlow(player, systemGuiHolder);
@@ -124,6 +129,13 @@ public class SystemGuiListener implements Listener {
                 systemGuiHolder.getPrevSystemGui().createInventory();
                 editLoreService.openEditLoreGui(player, systemGuiHolder.getPrevSystemGui());
             }
+
+            case DELETE_ITEM_ACTION_LEFT_COMMAND,
+                 DELETE_ITEM_ACTION_SHIFT_LEFT_COMMAND,
+                 DELETE_ITEM_ACTION_MIDDLE_COMMAND,
+                 DELETE_ITEM_ACTION_RIGHT_COMMAND,
+                 DELETE_ITEM_ACTION_SHIFT_RIGHT_COMMAND ->
+                    editActionService.deleteItemActionCommand(player, systemGuiHolder, systemCommand, slot - 29);
 
             case BACK -> {
                 player.closeInventory();

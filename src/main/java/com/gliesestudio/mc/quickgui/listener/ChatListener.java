@@ -4,6 +4,7 @@ import com.gliesestudio.mc.quickgui.QuickGUI;
 import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
 import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
 import com.gliesestudio.mc.quickgui.model.AwaitingInputHolder;
+import com.gliesestudio.mc.quickgui.service.EditActionService;
 import com.gliesestudio.mc.quickgui.service.EditGuiService;
 import com.gliesestudio.mc.quickgui.service.EditItemService;
 import com.gliesestudio.mc.quickgui.service.EditLoreService;
@@ -30,12 +31,14 @@ public class ChatListener implements Listener {
     private final EditGuiService editGuiService;
     private final EditItemService editItemService;
     private final EditLoreService editLoreService;
+    private final EditActionService editActionService;
 
     public ChatListener(QuickGUI plugin) {
         this.plugin = plugin;
         this.editGuiService = plugin.getEditGuiService();
         this.editItemService = plugin.getEditItemService();
         this.editLoreService = plugin.getEditLoreService();
+        this.editActionService = plugin.getEditActionService();
     }
 
     @EventHandler
@@ -98,22 +101,32 @@ public class ChatListener implements Listener {
 
                 case INPUT_ITEM_NAME -> {
                     boolean isSaved = editItemService.updateItemConfig(awaitingInputHolder.getSystemGuiHolder(), awaitingInputHolder.getInputType(), textInput);
-                    if (isSaved) openAwaitingGui(player, awaitingInputHolder.getSystemGuiHolder(), true);
+                    if (isSaved) openAwaitingGui(player, awaitingInputHolder.getSystemGuiHolder());
                     else player.sendMessage("§cFailed to change GUI name");
                 }
 
-                case INPUT_ADD_ITEM_LORE -> {
+                case INPUT_ADD_ITEM_LORE,
+                     INPUT_EDIT_ITEM_LORE -> {
                     boolean isSaved = editLoreService.editItemLoreConfig(awaitingInputHolder.getSystemGuiHolder(),
-                            awaitingInputHolder.getInputType(), textInput, awaitingInputHolder.getEditLorePosition());
-                    if (isSaved) openAwaitingLoreGui(player, awaitingInputHolder.getSystemGuiHolder());
-                    else player.sendMessage("§cFailed to add GUI item lore");
-                }
-
-                case INPUT_EDIT_ITEM_LORE -> {
-                    boolean isSaved = editLoreService.editItemLoreConfig(awaitingInputHolder.getSystemGuiHolder(),
-                            awaitingInputHolder.getInputType(), textInput, awaitingInputHolder.getEditLorePosition());
+                            awaitingInputHolder.getInputType(), textInput, awaitingInputHolder.getEditItemPosition());
                     if (isSaved) openAwaitingLoreGui(player, awaitingInputHolder.getSystemGuiHolder());
                     else player.sendMessage("§cFailed to edit GUI item lore");
+                }
+
+                case INPUT_ADD_ITEM_ACTION_LEFT_COMMAND,
+                     INPUT_EDIT_ITEM_ACTION_LEFT_COMMAND,
+                     INPUT_ADD_ITEM_ACTION_SHIFT_LEFT_COMMAND,
+                     INPUT_EDIT_ITEM_ACTION_SHIFT_LEFT_COMMAND,
+                     INPUT_ADD_ITEM_ACTION_MIDDLE_COMMAND,
+                     INPUT_EDIT_ITEM_ACTION_MIDDLE_COMMAND,
+                     INPUT_ADD_ITEM_ACTION_RIGHT_COMMAND,
+                     INPUT_EDIT_ITEM_ACTION_RIGHT_COMMAND,
+                     INPUT_ADD_ITEM_ACTION_SHIFT_RIGHT_COMMAND,
+                     INPUT_EDIT_ITEM_ACTION_SHIFT_RIGHT_COMMAND -> {
+                    SystemGuiHolder newSystemGuiHolder = editActionService.editItemCommandConfig(player, awaitingInputHolder.getSystemGuiHolder(),
+                            awaitingInputHolder.getInputType(), textInput, awaitingInputHolder.getEditItemPosition());
+                    if (newSystemGuiHolder != null) openAwaitingGui(player, newSystemGuiHolder);
+                    else player.sendMessage("§cFailed to edit GUI item action command");
                 }
 
                 // If no input has matched or not implemented
@@ -125,10 +138,10 @@ public class ChatListener implements Listener {
         }
     }
 
-    private void openAwaitingGui(Player player, SystemGuiHolder systemGuiHolder, boolean reload) {
+    private void openAwaitingGui(Player player, SystemGuiHolder systemGuiHolder) {
         // Schedule the inventory opening on the main thread
         Bukkit.getScheduler().runTask(plugin, () -> {
-            if (reload) editGuiService.reloadGui(systemGuiHolder.getGui().getName());
+            editGuiService.reloadGui(systemGuiHolder.getGui().getName());
             player.openInventory(systemGuiHolder.createInventory());
         });
     }
@@ -169,7 +182,7 @@ public class ChatListener implements Listener {
         AwaitingInputHolder inputHolder = new AwaitingInputHolder()
                 .inputType(inputType)
                 .systemGuiHolder(systemGuiHolder)
-                .editLorePosition(editLorePosition);
+                .editItemPosition(editLorePosition);
         awaitingInputs.put(playerUuid, inputHolder);
     }
 

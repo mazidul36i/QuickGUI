@@ -19,15 +19,13 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class SystemGuiHolder extends GuiHolder {
 
     private static final Logger log = LoggerFactory.getLogger(SystemGuiHolder.class);
     private final GUI systemGui;
-    @Getter
     private final SystemGuiHolder prevSystemGui;
-    @Getter
     private final Integer editItemSlot;
-    @Getter
     private final GuiItemActionType itemActionType;
 
     public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode) {
@@ -61,6 +59,14 @@ public class SystemGuiHolder extends GuiHolder {
         this.editItemSlot = editItemSlot;
         this.itemActionType = itemActionType;
         this.prevSystemGui = prevSystemGui;
+    }
+
+    public SystemGuiHolder(SystemGuiHolder systemGuiHolder, GUI newSystemGui) {
+        super(systemGuiHolder.plugin, systemGuiHolder.player, systemGuiHolder.gui, systemGuiHolder.getMode(), systemGuiHolder.getPreviousGui());
+        this.systemGui = newSystemGui;
+        this.prevSystemGui = systemGuiHolder.getPrevSystemGui();
+        this.editItemSlot = systemGuiHolder.getEditItemSlot();
+        this.itemActionType = systemGuiHolder.getItemActionType();
     }
 
     public boolean hasPrevSystemGui() {

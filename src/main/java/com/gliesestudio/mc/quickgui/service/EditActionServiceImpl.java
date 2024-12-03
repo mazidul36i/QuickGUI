@@ -1,26 +1,28 @@
 package com.gliesestudio.mc.quickgui.service;
 
 import com.gliesestudio.mc.quickgui.QuickGUI;
+import com.gliesestudio.mc.quickgui.enums.AwaitingInputType;
 import com.gliesestudio.mc.quickgui.enums.PlayerHead;
 import com.gliesestudio.mc.quickgui.enums.SystemCommand;
 import com.gliesestudio.mc.quickgui.gui.GUI;
 import com.gliesestudio.mc.quickgui.gui.OpenMode;
 import com.gliesestudio.mc.quickgui.gui.SystemGuiHolder;
+import com.gliesestudio.mc.quickgui.gui.command.GuiCommandExecutor;
 import com.gliesestudio.mc.quickgui.gui.item.*;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
 import com.gliesestudio.mc.quickgui.utility.Constants;
 import com.gliesestudio.mc.quickgui.utility.StringUtils;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 
 // TODO: Make implementation for changes and saving of item actions...
 public class EditActionServiceImpl implements EditActionService {
@@ -37,14 +39,7 @@ public class EditActionServiceImpl implements EditActionService {
     @Override
     public void openEditActionGui(@NotNull Player player, SystemGuiHolder systemGuiHolder, SystemCommand actionCommand) {
         log.info("Open edit action gui for item slot: {} and action command: {}", systemGuiHolder.getEditItemSlot(), actionCommand);
-        GuiItemActionType itemActionType = switch (actionCommand) {
-            case EDIT_ITEM_ACTION_LEFT -> GuiItemActionType.LEFT;
-            case EDIT_ITEM_ACTION_SHIFT_LEFT -> GuiItemActionType.SHIFT_LEFT;
-            case EDIT_ITEM_ACTION_MIDDLE -> GuiItemActionType.MIDDLE;
-            case EDIT_ITEM_ACTION_RIGHT -> GuiItemActionType.RIGHT;
-            case EDIT_ITEM_ACTION_SHIFT_RIGHT -> GuiItemActionType.SHIFT_RIGHT;
-            default -> null;
-        };
+        GuiItemActionType itemActionType = actionCommand.getItemActionType();
         // Verify if the action type is valid.
         if (itemActionType == null) {
             player.sendMessage("§cCouldn't find the action type for the command: " + actionCommand);
@@ -60,6 +55,104 @@ public class EditActionServiceImpl implements EditActionService {
         player.openInventory(editItemGuiHolder.getInventory());
     }
 
+    @Override
+    public void deleteItemActionCommand(Player player, SystemGuiHolder systemGuiHolder, @NotNull SystemCommand deleteCommand, int deleteCommandPosition) {
+        GuiItemActionType itemActionType = deleteCommand.getItemActionType();
+        // Verify if the action type is valid.
+        if (itemActionType == null) {
+            player.sendMessage("§cCouldn't find the action type for the command: " + deleteCommand);
+            return;
+        }
+
+        log.info("Delete command for action: {}, pos: {}", itemActionType, deleteCommandPosition);
+        GUI gui = systemGuiHolder.getGui();
+        if (gui == null) return;
+        GuiItem guiItem = gui.getItem(systemGuiHolder.getEditItemSlot());
+        GuiItemAction guiItemAction = guiItem.getAction(itemActionType);
+        if (guiItemAction == null || CollectionUtils.isEmpty(guiItemAction.getCommands())) return;
+
+        // Remove the lore
+        if (deleteCommandPosition < 0 || deleteCommandPosition >= guiItemAction.getCommands().size()) return;
+        guiItemAction.getCommands().remove(deleteCommandPosition);
+
+        try {
+            File guiConfigFile = new File(guiFolder, systemGuiHolder.getGui().getName() + ".yml");
+            FileConfiguration guiConfig = gui.serialize();
+            guiConfig.save(guiConfigFile);
+        } catch (IOException ignored) {
+        }
+
+        // Recreate command gui items
+        Inventory inventory = systemGuiHolder.getInventory();
+        GUI systemGui = systemGuiHolder.getSystemGui();
+        Map<Integer, GuiItem> systemGuiItems = systemGui.getItems();
+        for (int i = 0; i < 6; i++) {
+            systemGuiItems.remove(i + 29);
+            inventory.clear(i + 29);
+        }
+        systemGuiItems.putAll(createCommandsGuiItems(guiItem.getAction(itemActionType), itemActionType));
+        for (int i = 0; i < 6; i++) {
+            if (systemGuiItems.containsKey(i + 29))
+                inventory.setItem(i + 29, systemGuiItems.get(i + 29).createItemStack(player));
+        }
+    }
+
+    @Override
+    public SystemGuiHolder editItemCommandConfig(Player player, SystemGuiHolder systemGuiHolder, @NotNull AwaitingInputType inputType, String command, Integer editCommandPosition) {
+        boolean isAddCommand = editCommandPosition == null;
+        GuiItemActionType itemActionType = switch (inputType) {
+            case INPUT_ADD_ITEM_ACTION_LEFT_COMMAND,
+                 INPUT_EDIT_ITEM_ACTION_LEFT_COMMAND -> GuiItemActionType.LEFT;
+            case INPUT_ADD_ITEM_ACTION_SHIFT_LEFT_COMMAND,
+                 INPUT_EDIT_ITEM_ACTION_SHIFT_LEFT_COMMAND -> GuiItemActionType.SHIFT_LEFT;
+            case INPUT_ADD_ITEM_ACTION_MIDDLE_COMMAND,
+                 INPUT_EDIT_ITEM_ACTION_MIDDLE_COMMAND -> GuiItemActionType.MIDDLE;
+            case INPUT_ADD_ITEM_ACTION_RIGHT_COMMAND,
+                 INPUT_EDIT_ITEM_ACTION_RIGHT_COMMAND -> GuiItemActionType.RIGHT;
+            case INPUT_ADD_ITEM_ACTION_SHIFT_RIGHT_COMMAND,
+                 INPUT_EDIT_ITEM_ACTION_SHIFT_RIGHT_COMMAND -> GuiItemActionType.SHIFT_RIGHT;
+            default -> null;
+        };
+        // Verify if the action type is valid.
+        if (itemActionType == null) return null;
+
+        GUI gui = systemGuiHolder.getGui();
+        if (gui == null) return null;
+        GuiItem guiItem = gui.getItem(systemGuiHolder.getEditItemSlot());
+        GuiItemAction guiItemAction = guiItem.getAction(itemActionType);
+
+        // Set actions and commands if it is null
+        if (guiItemAction == null) {
+            guiItemAction = new GuiItemAction();
+            guiItemAction.setExecutor(GuiCommandExecutor.SERVER);
+        }
+        if (guiItemAction.getCommands() == null) guiItemAction.setCommands(new ArrayList<>());
+
+        // Add or edit command
+        if (isAddCommand) {
+            guiItemAction.getCommands().add(command);
+        } else {
+            if (editCommandPosition < 0 || editCommandPosition >= guiItemAction.getCommands().size()) return null;
+            guiItemAction.getCommands().set(editCommandPosition, command);
+        }
+
+        // Set updated action avoiding null pointer exceptions.
+        if (guiItem.getActions() == null) guiItem.setActions(Map.of(itemActionType, guiItemAction));
+        else guiItem.getActions().put(itemActionType, guiItemAction);
+
+        // Save the updated action config
+        try {
+            File guiConfigFile = new File(guiFolder, systemGuiHolder.getGui().getName() + ".yml");
+            FileConfiguration guiConfig = gui.serialize();
+            guiConfig.save(guiConfigFile);
+            // Recreate the system GUI with updated command actions.
+            GUI actionGui = createActionGui(guiItem, itemActionType);
+            return new SystemGuiHolder(systemGuiHolder, actionGui);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
     private GUI createActionGui(GuiItem editItem, GuiItemActionType itemActionType) {
         GUI actionGui = new GUI();
         actionGui.setName("edit-actions");
@@ -70,7 +163,7 @@ public class EditActionServiceImpl implements EditActionService {
         Map<Integer, GuiItem> guiItemMap = new HashMap<>();
         guiItemMap.put(4, editItem);
         guiItemMap.putAll(createStaticActionGuiItems(editItem.getAction(itemActionType)));
-        guiItemMap.putAll(createCommandsGuiItems(editItem.getAction(itemActionType)));
+        guiItemMap.putAll(createCommandsGuiItems(editItem.getAction(itemActionType), itemActionType));
 
         actionGui.setItems(guiItemMap);
         return actionGui;
@@ -229,9 +322,10 @@ public class EditActionServiceImpl implements EditActionService {
         return guiItemMap;
     }
 
-    private Map<Integer, GuiItem> createCommandsGuiItems(GuiItemAction itemAction) {
+    private Map<Integer, GuiItem> createCommandsGuiItems(GuiItemAction itemAction, GuiItemActionType itemActionType) {
         Map<Integer, GuiItem> commandsItemMap = new HashMap<>();
 
+        // Add command GUI item
         GuiItem addCommandItem = new GuiItem();
         addCommandItem.setItem(GuiItemInfo.builder()
                 .name(Material.PLAYER_HEAD.name())
@@ -240,34 +334,38 @@ public class EditActionServiceImpl implements EditActionService {
                 .type(GuiItemType.SYSTEM_BUTTON)
                 .hideTooltip(false)
                 .build());
+        // Actions
+        GuiItemAction addCommandLeftAction = new GuiItemAction();
+        addCommandLeftAction.setCommands(List.of(String.format("add item action %s command", itemActionType.getType())));
+        addCommandItem.setActions(Map.of(GuiItemActionType.LEFT, addCommandLeftAction));
 
         if (itemAction == null || CollectionUtils.isEmpty(itemAction.getCommands())) {
             commandsItemMap.put(29, addCommandItem);
             return commandsItemMap;
         }
 
-        List<String> commands = itemAction.getCommands().stream().filter(StringUtils::hasText).toList();
+        List<String> commands = itemAction.getCommands().stream().filter(StringUtils::hasText).limit(6).toList();
         for (int i = 0; i < commands.size(); i++) {
-            commandsItemMap.put(i + 29, createCommandGuiItem(commands.get(i)));
+            commandsItemMap.put(i + 29, createCommandGuiItem(commands.get(i), itemActionType));
         }
 
-        commandsItemMap.put(29 + commands.size(), addCommandItem);
+        if (commands.size() < 6) commandsItemMap.put(29 + commands.size(), addCommandItem);
         return commandsItemMap;
     }
 
-    private static @NotNull GuiItem createCommandGuiItem(@NotNull String command) {
+    private static @NotNull GuiItem createCommandGuiItem(@NotNull String command, GuiItemActionType itemActionType) {
         GuiItem guiItem = new GuiItem();
-        GuiItemInfo itemInfo = new GuiItemInfo();
-        itemInfo.setName("BOOK");
-        itemInfo.setType(GuiItemType.SYSTEM_BUTTON);
-        itemInfo.setDisplayName("&a" + command);
-        guiItem.setItem(itemInfo);
+        guiItem.setItem(GuiItemInfo.builder()
+                .name("BOOK")
+                .type(GuiItemType.SYSTEM_BUTTON)
+                .displayName("&a" + command)
+                .build());
 
         // Gui actions
         GuiItemAction leftAction = new GuiItemAction();
         GuiItemAction rightAction = new GuiItemAction();
-        leftAction.setCommands(List.of("edit item action-left command"));
-        rightAction.setCommands(List.of("delete item action-left command"));
+        leftAction.setCommands(List.of(String.format("edit item action %s command", itemActionType.getType())));
+        rightAction.setCommands(List.of(String.format("delete item action %s command", itemActionType.getType())));
 
         guiItem.setActions(Map.of(
                 GuiItemActionType.LEFT, leftAction,
