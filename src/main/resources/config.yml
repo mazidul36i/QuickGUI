@@ -1,0 +1,13 @@
+guis:
+  exampleGui:
+    title: "My Custom GUI"
+    rows: 3
+    items:
+      slot1:
+        item: "DIAMOND"
+        display-name: "&bShiny Diamond"
+        command: "say Hello, %player%!"
+      slot2:
+        item: "IRON_SWORD"
+        display-name: "&cEpic Sword"
+        command: "give %player% iron_sword 1"

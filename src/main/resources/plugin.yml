@@ -1,7 +1,14 @@
-name: BetterGUI
+name: QuickGUI
 version: '1.0-alpha'
 main: com.gliesestudio.mc.bettergui.BetterGUI
 api-version: '1.21'
 authors: [ Mazidul Islam ]
-description: Better TPA is the goto plugin to manage player tpa and set warps with ease.
+description: Better GUI is the goto plugin to manage all your GUI needs.
 website: https://mazidul.com
+
+commands:
+  opengui:
+    description: Opens a custom GUI for the player
+    usage: /opengui <guiName>
+    permission: bettergui.opengui
+    permission-message: "You don't have permission to open this GUI."
