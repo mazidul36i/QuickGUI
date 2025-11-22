@@ -7,7 +7,7 @@ rows: 1
 items:
   0:
     item:
-      name: LIME_STAINED_GLASS_PANEt
+      name: LIME_STAINED_GLASS_PANE
       type: filler
   1:
     item:
