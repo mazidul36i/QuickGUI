@@ -27,6 +27,7 @@ items:
         commands:
           - 'tellraw %player% [{"text": "Hey, %player%! Welcome to the ", "color": "white"}, {"text": "QuickGUI", "color": "aqua"}, {"text": ".", "color": "white"}]'
         close-inv: true
+        executor: server
 
   4:
     item:
@@ -36,8 +37,9 @@ items:
     actions:
       left:
         commands:
-          - '/help quickgui'
+          - 'help quickgui'
         close-inv: true
+        executor: player
 
   5:
     item:
