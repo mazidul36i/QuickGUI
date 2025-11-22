@@ -35,7 +35,8 @@ items:
       display-name: '&cHelp'
     actions:
       left:
-        command: help quickgui
+        commands:
+          - '/help quickgui'
         close-inv: true
 
   5:
