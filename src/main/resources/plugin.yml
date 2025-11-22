@@ -23,11 +23,13 @@ commands:
   gui:
     description: Execute specific actions for QuickGUI like create, edit, delete, reload, etc.
     usage: /gui <action>
+    aliases: [gui, quickgui]
     permission: quickgui.admin
     permission-message: "You don't have permission to use this command."
 
   opengui:
     description: Opens a custom GUI for the player
     usage: /opengui <gui_name>
+    aliases: [opengui, open]
     permission: quickgui.opengui
     permission-message: "You don't have permission to open this GUI."
