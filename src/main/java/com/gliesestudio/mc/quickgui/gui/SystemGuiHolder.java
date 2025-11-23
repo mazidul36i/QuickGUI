@@ -5,6 +5,7 @@ import com.gliesestudio.mc.quickgui.gui.item.GuiItem;
 import com.gliesestudio.mc.quickgui.gui.item.GuiItemActionType;
 import com.gliesestudio.mc.quickgui.placeholder.SystemPlaceholder;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
+import com.gliesestudio.mc.quickgui.utility.Constants;
 import com.gliesestudio.mc.quickgui.utility.PluginUtils;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -30,42 +31,42 @@ public class SystemGuiHolder extends GuiHolder {
 
     public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode) {
         super(plugin, player, gui, mode);
-        this.systemGui = systemGui;
-        this.prevSystemGui = null;
-        this.editItemSlot = null;
+        this.systemGui      = systemGui;
+        this.prevSystemGui  = null;
+        this.editItemSlot   = null;
         this.itemActionType = null;
     }
 
     public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode, Integer editItemSlot) {
         super(plugin, player, gui, mode);
-        this.systemGui = systemGui;
-        this.prevSystemGui = null;
-        this.editItemSlot = editItemSlot;
+        this.systemGui      = systemGui;
+        this.prevSystemGui  = null;
+        this.editItemSlot   = editItemSlot;
         this.itemActionType = null;
     }
 
     public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode, Integer editItemSlot, SystemGuiHolder prevSystemGui) {
         super(plugin, player, gui, mode);
-        this.systemGui = systemGui;
-        this.editItemSlot = editItemSlot;
-        this.prevSystemGui = prevSystemGui;
+        this.systemGui      = systemGui;
+        this.editItemSlot   = editItemSlot;
+        this.prevSystemGui  = prevSystemGui;
         this.itemActionType = null;
     }
 
     public SystemGuiHolder(QuickGUI plugin, Player player, GUI systemGui, GUI gui, OpenMode mode, Integer editItemSlot,
                            GuiItemActionType itemActionType, SystemGuiHolder prevSystemGui) {
         super(plugin, player, gui, mode);
-        this.systemGui = systemGui;
-        this.editItemSlot = editItemSlot;
+        this.systemGui      = systemGui;
+        this.editItemSlot   = editItemSlot;
         this.itemActionType = itemActionType;
-        this.prevSystemGui = prevSystemGui;
+        this.prevSystemGui  = prevSystemGui;
     }
 
     public SystemGuiHolder(SystemGuiHolder systemGuiHolder, GUI newSystemGui) {
         super(systemGuiHolder.plugin, systemGuiHolder.player, systemGuiHolder.gui, systemGuiHolder.getMode(), systemGuiHolder.getPreviousGui());
-        this.systemGui = newSystemGui;
-        this.prevSystemGui = systemGuiHolder.getPrevSystemGui();
-        this.editItemSlot = systemGuiHolder.getEditItemSlot();
+        this.systemGui      = newSystemGui;
+        this.prevSystemGui  = systemGuiHolder.getPrevSystemGui();
+        this.editItemSlot   = systemGuiHolder.getEditItemSlot();
         this.itemActionType = systemGuiHolder.getItemActionType();
     }
 
@@ -107,7 +108,7 @@ public class SystemGuiHolder extends GuiHolder {
 
             ItemStack itemStack = guiItem.createItemStack(super.player, placeholders);
             if (itemStack != null) {
-                if (OpenMode.EDIT_ITEMS.equals(super.getMode())) super.inventory.setItem(4, itemStack);
+                if (OpenMode.EDIT_ITEMS.equals(super.getMode())) super.inventory.setItem(Constants.EDIT_GUI_ITEM_SLOT, itemStack);
                 if (OpenMode.EDIT_LORES.equals(super.getMode())) super.inventory.setItem(0, itemStack);
             }
         }
