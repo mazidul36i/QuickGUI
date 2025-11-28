@@ -118,6 +118,10 @@ public class SystemGuiListener implements Listener {
         switch (systemCommand) {
             case EDIT_ITEMS -> editGuiService.openGuiEditItem(player, systemGuiHolder);
 
+            /*=========================
+             *     EDIT ITEM GUI      *
+             =========================*/
+
             case CHANGE_ITEM_LORES -> editLoreService.openEditLoreGui(player, systemGuiHolder);
 
             case EDIT_ITEM_ACTION_LEFT,
