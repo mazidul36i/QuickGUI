@@ -29,17 +29,17 @@ item management, and administrative tools.
 
 ## Commands
 
-* `/quickgui create <name>`: Creates a new GUI with the specified name.
-* `/quickgui edit <name>`: Opens the editor for the specified GUI.
-* `/quickgui delete <name>`: Deletes the specified GUI.
-* `/quickgui list`: Lists all available GUIs.
+* `/gui create <name>`: Creates a new GUI with the specified name.
+* `/gui edit <name>`: Opens the editor for the specified GUI.
+* `/gui delete <name>`: Deletes the specified GUI.
+* `/gui list`: Lists all available GUIs.
 
 ## Permissions
 
-* `quickgui.create`: Allows players to create new GUIs.
-* `quickgui.edit`: Allows players to edit existing GUIs.
-* `quickgui.delete`: Allows players to delete GUIs.
-* `quickgui.list`: Allows players to list available GUIs.
+* `gui.create`: Allows players to create new GUIs.
+* `gui.edit`: Allows players to edit existing GUIs.
+* `gui.delete`: Allows players to delete GUIs.
+* `gui.list`: Allows players to list available GUIs.
 
 ## Contributing
 

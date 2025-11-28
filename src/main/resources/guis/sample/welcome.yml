@@ -7,7 +7,7 @@ rows: 1
 items:
   0:
     item:
-      name: LIME_STAINED_GLASS_PANEt
+      name: LIME_STAINED_GLASS_PANE
       type: filler
   1:
     item:
@@ -27,6 +27,7 @@ items:
         commands:
           - 'tellraw %player% [{"text": "Hey, %player%! Welcome to the ", "color": "white"}, {"text": "QuickGUI", "color": "aqua"}, {"text": ".", "color": "white"}]'
         close-inv: true
+        executor: server
 
   4:
     item:
@@ -35,8 +36,10 @@ items:
       display-name: '&cHelp'
     actions:
       left:
-        command: help quickgui
+        commands:
+          - 'help quickgui'
         close-inv: true
+        executor: player
 
   5:
     item:

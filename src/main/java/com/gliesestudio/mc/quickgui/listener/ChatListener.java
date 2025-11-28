@@ -99,6 +99,10 @@ public class ChatListener implements Listener {
                     else player.sendMessage("§cFailed to change GUI alias");
                 }
 
+                /*=========================
+                 *        EDIT ITEM       *
+                 =========================*/
+
                 case INPUT_ITEM_NAME -> {
                     boolean isSaved = editItemService.updateItemConfig(awaitingInputHolder.getSystemGuiHolder(), awaitingInputHolder.getInputType(), textInput);
                     if (isSaved) openAwaitingGui(player, awaitingInputHolder.getSystemGuiHolder());

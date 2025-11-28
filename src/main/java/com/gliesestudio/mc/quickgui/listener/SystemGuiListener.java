@@ -15,6 +15,7 @@ import com.gliesestudio.mc.quickgui.service.EditGuiService;
 import com.gliesestudio.mc.quickgui.service.EditItemService;
 import com.gliesestudio.mc.quickgui.service.EditLoreService;
 import com.gliesestudio.mc.quickgui.utility.CollectionUtils;
+import com.gliesestudio.mc.quickgui.utility.Constants;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,11 +42,11 @@ public class SystemGuiListener implements Listener {
     private final EditActionService editActionService;
 
     public SystemGuiListener(QuickGUI plugin, ChatListener chatListener) {
-        this.plugin = plugin;
-        this.chatListener = chatListener;
-        this.editGuiService = plugin.getEditGuiService();
-        this.editItemService = plugin.getEditItemService();
-        this.editLoreService = plugin.getEditLoreService();
+        this.plugin            = plugin;
+        this.chatListener      = chatListener;
+        this.editGuiService    = plugin.getEditGuiService();
+        this.editItemService   = plugin.getEditItemService();
+        this.editLoreService   = plugin.getEditLoreService();
         this.editActionService = plugin.getEditActionService();
     }
 
@@ -63,6 +64,13 @@ public class SystemGuiListener implements Listener {
         int slot = event.getSlot();
         ClickType clickType = event.getClick();
         event.setCancelled(true); // Prevent players from taking items
+
+        // Special case: Handle the action to change gui item.
+        if (holder.getMode() == OpenMode.EDIT_ITEMS && slot == Constants.EDIT_GUI_ITEM_SLOT && clickType == ClickType.LEFT) {
+            editItemService.changeItem(player, holder);
+            player.openInventory(holder.createInventory());
+            return;
+        }
 
         GuiItem guiItem = holder.getSystemGuiItem(slot);
         if (guiItem == null) return;
@@ -92,7 +100,7 @@ public class SystemGuiListener implements Listener {
 
         String command = action.getCommands().getFirst();
         SystemCommand systemCommand = SystemCommand.fromString(command);
-        log.info("Command: {} and system command: {}", command, systemCommand);
+        log.info("Command: '{}' and system command: '{}'", command, systemCommand);
 
         // On click input commands
         if (systemCommand != null && systemCommand.getInputType() != null) {
@@ -100,7 +108,7 @@ public class SystemGuiListener implements Listener {
             if (AwaitingInputType.INPUT_EDIT_ITEM_LORE.equals(systemCommand.getInputType())) {
                 chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder, slot - 2);
             } else if (List.of(EDIT_ITEM_ACTION_LEFT_COMMAND, EDIT_ITEM_ACTION_SHIFT_LEFT_COMMAND, EDIT_ITEM_ACTION_MIDDLE_COMMAND,
-                    EDIT_ITEM_ACTION_RIGHT_COMMAND, EDIT_ITEM_ACTION_SHIFT_RIGHT_COMMAND).contains(systemCommand)) {
+                               EDIT_ITEM_ACTION_RIGHT_COMMAND, EDIT_ITEM_ACTION_SHIFT_RIGHT_COMMAND).contains(systemCommand)) {
                 chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder, slot - 29);
             } else chatListener.addAwaitingInput(player.getUniqueId(), systemCommand.getInputType(), systemGuiHolder);
             player.closeInventory();
@@ -109,6 +117,10 @@ public class SystemGuiListener implements Listener {
 
         switch (systemCommand) {
             case EDIT_ITEMS -> editGuiService.openGuiEditItem(player, systemGuiHolder);
+
+            /*=========================
+             *     EDIT ITEM GUI      *
+             =========================*/
 
             case CHANGE_ITEM_LORES -> editLoreService.openEditLoreGui(player, systemGuiHolder);
 
